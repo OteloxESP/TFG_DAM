@@ -5,4 +5,6 @@
     <string name="forgot_password_text">¿Olvidaste la contraseña?</string>
     <string name="register_text">Registrarse</string>
     <string name="login">Login</string>
+    <string name="username_required_error">Usuario requerido</string>
+    <string name="password_required_error">Contraseña requerida</string>
 </resources>
