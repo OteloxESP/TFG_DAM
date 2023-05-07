@@ -3,6 +3,7 @@ package com.example.oteloxtfgdam;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -53,6 +54,15 @@ public class MainActivity extends AppCompatActivity {
         mPasswordEditText = findViewById(R.id.password_edit_text);
         mUsernameTextInputLayout = findViewById(R.id.username_text_input_layout);
         mPasswordTextInputLayout = findViewById(R.id.password_text_input_layout);
+
+        Button registerButton = findViewById(R.id.register_button);
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // Configurar un Listener para el botón de inicio de sesión
         Button loginButton = findViewById(R.id.login_button);
@@ -154,8 +164,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("EXAMPLE", "Error during find task: ", e);
                     }
                 });
-
-
             }
         });
 

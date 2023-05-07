@@ -7,6 +7,8 @@ public class UsuariosDB {
     private String usuario;
     private String contraseña;
 
+    private String email;
+
     public UsuariosDB() {
 
     }
@@ -15,6 +17,13 @@ public class UsuariosDB {
         this.id = id;
         this.usuario = usuario;
         this.contraseña = contraseña;
+    }
+
+    public UsuariosDB(ObjectId id, String usuario, String contraseña, String email){
+        this.id = id;
+        this.usuario = usuario;
+        this.contraseña = contraseña;
+        this.email = email;
     }
 
     public ObjectId getId() {
@@ -39,5 +48,13 @@ public class UsuariosDB {
 
     public void setContraseña(String contraseña) {
         this.contraseña = contraseña;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
