@@ -7,4 +7,6 @@
     <string name="login">Login</string>
     <string name="username_required_error">Usuario requerido</string>
     <string name="password_required_error">Contraseña requerida</string>
+    <string name="username_incorrect">Usuario incorrecto</string>
+    <string name="password_incorrect">Contraseña incorrecta</string>
 </resources>
