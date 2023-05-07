@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (result.isSuccess()) {
                                     Log.v("User", "Logged In Successfully");
                                     initializeMongoDB(usuario, contraseña);
-                                    Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
                                 } else {
                                     Log.v("User", "Failed to Login");
                                     Toast.makeText(MainActivity.this, "Failed to login", Toast.LENGTH_SHORT).show();
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                     } else {
-                        Toast.makeText(v.getContext(), "user is not null", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(v.getContext(), "user is not null", Toast.LENGTH_SHORT).show();
                         initializeMongoDB(usuario, contraseña);
                     }
                 }else{
@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 findTask.getAsync(task -> {
                     try {
                         Boolean v = false;
+                        Boolean v2 = false;
                         if (task.isSuccess()) {
                             MongoCursor<UsuariosDB> results = task.get();
                             Log.v("EXAMPLE", "successfully found documents:");
@@ -127,20 +128,26 @@ public class MainActivity extends AppCompatActivity {
                                 UsuariosDB u = results.next();
                                 if (usuario.equals(u.getUsuario())){
                                     v = true;
+                                    if (contraseña.equals(u.getContraseña())){
+                                        v2 = true;
+                                    }
                                 }
                             }
                         } else {
                             Log.e("EXAMPLE", "failed to find documents with: ", task.getError());
                         }
 
-                        if (v){
+                        if (v && v2){
                             mUsernameTextInputLayout.setError(null);
                             mPasswordTextInputLayout.setError(null);
-                            Toast.makeText(getApplicationContext(), "Login Successful 2", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
                         }
-                        else
+                        else if (!v && !v2)
                         {
                             mUsernameTextInputLayout.setError(getString(R.string.username_incorrect));
+                            mPasswordTextInputLayout.setError(getString(R.string.password_incorrect));
+
+                        } else if (v && !v2) {
                             mPasswordTextInputLayout.setError(getString(R.string.password_incorrect));
                         }
                     } catch (Exception e) {

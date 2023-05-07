@@ -7,6 +7,13 @@
     <string name="login">Login</string>
     <string name="username_required_error">Usuario requerido</string>
     <string name="password_required_error">Contraseña requerida</string>
-    <string name="username_incorrect">Usuario incorrecto</string>
+    <string name="username_incorrect">Este usuario no existe</string>
     <string name="password_incorrect">Contraseña incorrecta</string>
+    <string name="registration_success">Registro realizado</string>
+    <string name="invalid_email">Email ya en uso</string>
+    <string name="email_required">Email requerido</string>
+    <string name="email">Email</string>
+    <string name="register">Registrarse</string>
+    <string name="login_volver">Volver</string>
+    <string name="email_required_error">Email requerido</string>
 </resources>
