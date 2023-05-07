@@ -1,4 +1,4 @@
-package com.example.oteloxtfgdam.activity.ui.slideshow;
+package com.example.oteloxtfgdam.activity.ui.perfil;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,22 +8,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.oteloxtfgdam.databinding.FragmentSlideshowBinding;
 
-public class SlideshowFragment extends Fragment {
+import com.example.oteloxtfgdam.databinding.FragmentPerfilBinding;
 
-private FragmentSlideshowBinding binding;
+public class PerfilFragment extends Fragment {
+
+private FragmentPerfilBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
-        SlideshowViewModel slideshowViewModel =
-                new ViewModelProvider(this).get(SlideshowViewModel.class);
+        PerfilViewModel perfilViewModel =
+                new ViewModelProvider(this).get(PerfilViewModel.class);
 
-    binding = FragmentSlideshowBinding.inflate(inflater, container, false);
+    binding = FragmentPerfilBinding.inflate(inflater, container, false);
     View root = binding.getRoot();
 
-        final TextView textView = binding.textSlideshow;
-        slideshowViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        /*final TextView textView = binding.textSlideshow;
+        perfilViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);*/
         return root;
     }
 

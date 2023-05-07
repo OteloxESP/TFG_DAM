@@ -27,4 +27,10 @@
     <string name="menu_inicio">Inicio</string>
     <string name="menu_mercado">Mercado</string>
     <string name="menu_perfil">Perfil</string>
+    <string name="carne_input_hint">Carne</string>
+    <string name="piel_input_hint">Piel</string>
+    <string name="hoz_input_hint">Hierbas</string>
+    <string name="sangre_input_hint">Sangre</string>
+    <string name="tala_input_hint">Tala</string>
+    <string name="recoleccion_section_header">Maestria en recolección</string>
 </resources>
