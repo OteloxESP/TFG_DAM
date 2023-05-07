@@ -25,6 +25,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/username"
+        app:startIconDrawable="@drawable/baseline_person_outline_24"
         app:layout_constraintTop_toBottomOf="@+id/guideline1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -49,6 +50,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/email"
+        app:startIconDrawable="@drawable/baseline_mail_outline_24"
         app:layout_constraintTop_toBottomOf="@+id/username_text_input_layout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -73,6 +75,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/password"
+        app:startIconDrawable="@drawable/baseline_lock_24"
         app:layout_constraintTop_toBottomOf="@+id/email_text_input_layout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -129,8 +132,8 @@
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline1"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.2" />
+        app:layout_constraintGuide_percent="0.3"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

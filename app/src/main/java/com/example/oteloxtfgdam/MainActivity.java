@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Obtener referencias a los componentes de la vista
         mUsernameEditText = findViewById(R.id.username_edit_text);
         mPasswordEditText = findViewById(R.id.password_edit_text);
         mUsernameTextInputLayout = findViewById(R.id.username_text_input_layout);
@@ -61,10 +60,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
-        // Configurar un Listener para el botón de inicio de sesión
         Button loginButton = findViewById(R.id.login_button);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,21 +96,16 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onResult(App.Result<User> result) {
                                 if (result.isSuccess()) {
-                                    Log.v("User", "Logged In Successfully");
                                     initializeMongoDB(usuario, contraseña);
-                                    //Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
+
                                 } else {
-                                    Log.v("User", "Failed to Login");
                                     Toast.makeText(MainActivity.this, "Failed to login", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
                     } else {
-                        //Toast.makeText(v.getContext(), "user is not null", Toast.LENGTH_SHORT).show();
                         initializeMongoDB(usuario, contraseña);
                     }
-                }else{
-
                 }
             }
             private void initializeMongoDB(String usuario, String contraseña) {
@@ -125,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                         mongoDatabase.getCollection(
                                 "Usuarios",
                                 UsuariosDB.class).withCodecRegistry(pojoCodecRegistry);
-                Log.v("EXAMPLE", "Successfully instantiated the MongoDB collection handle");
+
                 RealmResultTask<MongoCursor<UsuariosDB>> findTask = mongoCollection.find().iterator();
                 findTask.getAsync(task -> {
                     try {
@@ -160,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                         } else if (v && !v2) {
                             mPasswordTextInputLayout.setError(getString(R.string.password_incorrect));
                         }
+
                     } catch (Exception e) {
                         Log.e("EXAMPLE", "Error during find task: ", e);
                     }

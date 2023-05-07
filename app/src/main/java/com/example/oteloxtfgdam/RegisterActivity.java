@@ -5,6 +5,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,6 +14,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -35,6 +38,9 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mUsernameEditText;
     private EditText mEmailEditText;
     private EditText mPasswordEditText;
+    private TextInputLayout mUsernameTextInputLayout;
+    private TextInputLayout mPasswordTextInputLayout;
+    private TextInputLayout mEmailTextInputLayout;
     Realm uiThreadRealm;
     MongoClient mongoClient;
     MongoDatabase mongoDatabase;
@@ -53,43 +59,56 @@ public class RegisterActivity extends AppCompatActivity {
         mEmailEditText = findViewById(R.id.email_edit_text);
         mPasswordEditText = findViewById(R.id.password_edit_text);
 
+        mUsernameTextInputLayout = findViewById(R.id.username_text_input_layout);
+        mPasswordTextInputLayout = findViewById(R.id.password_text_input_layout);
+        mEmailTextInputLayout = findViewById(R.id.email_text_input_layout);
+
+        Button loginButton = findViewById(R.id.login_button);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         // Set up click listener for register button
         Button registerButton = findViewById(R.id.register_button);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get input values
                 String username = mUsernameEditText.getText().toString();
                 String email = mEmailEditText.getText().toString();
                 String password = mPasswordEditText.getText().toString();
                 boolean isValid = true;
-                // Validate inputs
+
                 if (TextUtils.isEmpty(username)) {
-                    mUsernameEditText.setError(getString(R.string.username_required_error));
+                    mUsernameTextInputLayout.setError(getString(R.string.username_required_error));
                     isValid = false;
                 }else{
-                    mUsernameEditText.setError(null);
+                    mUsernameTextInputLayout.setError(null);
                 }
 
                 if (TextUtils.isEmpty(email)) {
-                    mEmailEditText.setError(getString(R.string.email_required_error));
+                    mEmailTextInputLayout.setError(getString(R.string.email_required_error));
                     isValid = false;
                 }else{
-                    mEmailEditText.setError(null);
+                    mEmailTextInputLayout.setError(null);
                 }
 
                 if (TextUtils.isEmpty(password)) {
-                    mPasswordEditText.setError(getString(R.string.password_required_error));
+                    mPasswordTextInputLayout.setError(getString(R.string.password_required_error));
                     isValid = false;
                 }else{
-                    mPasswordEditText.setError(null);
+                    mPasswordTextInputLayout.setError(null);
                 }
 
                 if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    mEmailEditText.setError(getString(R.string.invalid_email));
+                    mEmailTextInputLayout.setError(getString(R.string.invalid_email));
                     isValid = false;
                 }else{
-                    mEmailEditText.setError(null);
+                    mEmailTextInputLayout.setError(null);
                 }
                 if (isValid) {
                     String usuario = mUsernameEditText.getText().toString();
@@ -103,23 +122,18 @@ public class RegisterActivity extends AppCompatActivity {
                             @Override
                             public void onResult(App.Result<User> result) {
                                 if (result.isSuccess()) {
-                                    Log.v("User", "Logged In Successfully");
                                     initializeMongoDB(usuario, contraseña, email);
-                                    //Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
                                 } else {
-                                    Log.v("User", "Failed to Login");
                                     Toast.makeText(v.getContext(), "Failed to login", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
                     } else {
-                        //Toast.makeText(v.getContext(), "user is not null", Toast.LENGTH_SHORT).show();
                         initializeMongoDB(usuario, contraseña, email);
                     }
                 }else{
 
                 }
-                // Show success message and finish activity
                 Toast.makeText(v.getContext(), R.string.registration_success, Toast.LENGTH_SHORT).show();
             }
 
@@ -168,7 +182,10 @@ public class RegisterActivity extends AppCompatActivity {
                             mongoCollection.insertOne(nuevoUser).getAsync(task2 -> {
                                 if (task2.isSuccess()) {
                                     Toast.makeText(getApplicationContext(), "Usuario nuevo registrado", Toast.LENGTH_SHORT).show();
-                                    Log.v("EXAMPLE", "successfully inserted a document with id: " + task2.get().getInsertedId());
+                                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+
                                 } else {
                                     Log.e("EXAMPLE", "failed to insert documents with: " + task2.getError().getErrorMessage());
                                 }
