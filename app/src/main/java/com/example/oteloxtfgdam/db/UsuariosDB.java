@@ -1,4 +1,4 @@
-package com.example.oteloxtfgdam;
+package com.example.oteloxtfgdam.db;
 
 import org.bson.types.ObjectId;
 

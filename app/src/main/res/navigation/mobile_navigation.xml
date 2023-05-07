@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_inicio">
+
+    <fragment
+        android:id="@+id/nav_inicio"
+        android:name="com.example.oteloxtfgdam.activity.ui.home.HomeFragment"
+        android:label="@string/menu_inicio"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_mercado"
+        android:name="com.example.oteloxtfgdam.activity.ui.gallery.GalleryFragment"
+        android:label="@string/menu_mercado"
+        tools:layout="@layout/fragment_gallery" />
+
+    <fragment
+        android:id="@+id/nav_perfil"
+        android:name="com.example.oteloxtfgdam.activity.ui.slideshow.SlideshowFragment"
+        android:label="@string/menu_perfil"
+        tools:layout="@layout/fragment_slideshow" />
+</navigation>

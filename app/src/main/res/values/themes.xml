@@ -6,4 +6,10 @@
     </style>
 
     <style name="Theme.OteloxTFGDAM" parent="Base.Theme.OteloxTFGDAM" />
+    <style name="Theme.OteloxTFGDAM.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.OteloxTFGDAM.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.OteloxTFGDAM.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>
