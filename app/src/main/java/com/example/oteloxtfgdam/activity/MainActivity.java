@@ -22,6 +22,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.mindrot.jbcrypt.BCrypt;
 
 import io.realm.Realm;
 import io.realm.mongodb.App;
@@ -141,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                                 UsuariosDB u = results.next();
                                 if (usuario.equals(u.getUsuario())){
                                     v = true;
-                                    if (contraseña.equals(u.getContraseña())){
+                                    if (BCrypt.checkpw(contraseña, u.getContraseña())){
                                         v2 = true;
                                     }
                                 }

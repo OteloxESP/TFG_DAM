@@ -17,7 +17,7 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class InicioActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class InicioActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityNavBinding binding;
@@ -39,17 +39,28 @@ public class InicioActivity extends AppCompatActivity implements NavigationView.
         });*/
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
-
+        MenuItem salirItem = navigationView.getMenu().findItem(R.id.nav_salir);
+        salirItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                SesionUsuario.getInstance(InicioActivity.this).borrarSesion();
+                Intent intent = new Intent(InicioActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
+            }
+        });
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_inicio, R.id.nav_mercado, R.id.nav_perfil, R.id.nav_salir)
+                R.id.nav_inicio, R.id.nav_mercado, R.id.nav_perfil)
                 .setOpenableLayout(drawer)
                 .build();
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_nav);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-        navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     /*@Override
@@ -65,24 +76,4 @@ public class InicioActivity extends AppCompatActivity implements NavigationView.
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        boolean v = false;
-        if (id == R.id.nav_salir) {
-            salir();
-            v = true;
-        }
-        return v;
-    }
-
-    private void salir() {
-        SesionUsuario.getInstance(InicioActivity.this).borrarSesion();
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-
 }

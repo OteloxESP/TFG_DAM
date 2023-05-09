@@ -23,6 +23,7 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId;
+import org.mindrot.jbcrypt.BCrypt;
 
 import io.realm.Realm;
 import io.realm.mongodb.App;
@@ -174,10 +175,12 @@ public class RegisterActivity extends AppCompatActivity {
 
                         if (!v && !v2)
                         {
+                            String salt = BCrypt.gensalt();
+                            String contraseñaEncriptada = BCrypt.hashpw(contraseña, salt);
                             UsuariosDB nuevoUser = new UsuariosDB(
                                     new ObjectId(),
                                     usuario,
-                                    contraseña,
+                                    contraseñaEncriptada,
                                     email
                             );
 
