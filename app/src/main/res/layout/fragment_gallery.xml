@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.ui.gallery.GalleryFragment" >
+    tools:context=".activity.ui.mercado.MercadoFragment" >
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

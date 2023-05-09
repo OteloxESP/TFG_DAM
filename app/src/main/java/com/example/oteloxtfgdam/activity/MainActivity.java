@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.oteloxtfgdam.R;
+import com.example.oteloxtfgdam.SesionUsuario;
 import com.example.oteloxtfgdam.db.UsuariosDB;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -50,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (SesionUsuario.getInstance(this).estaLogueado()) {
+            Intent intent = new Intent(this, InicioActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         mUsernameEditText = findViewById(R.id.username_edit_text);
         mPasswordEditText = findViewById(R.id.password_edit_text);
@@ -147,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                             mUsernameTextInputLayout.setError(null);
                             mPasswordTextInputLayout.setError(null);
                             Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
+                            SesionUsuario.getInstance(MainActivity.this).setUsuario(usuario);
                             Intent intent = new Intent(MainActivity.this, InicioActivity.class);
                             startActivity(intent);
                             finish();
