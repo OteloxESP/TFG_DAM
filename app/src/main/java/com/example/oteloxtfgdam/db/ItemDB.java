@@ -1,26 +1,32 @@
 package com.example.oteloxtfgdam.db;
 
 public class ItemDB {
-    private String name;
-    private String date;
-    private String amount;
+    private int id;
+    private String nombre;
+    private long fecha;
+    private long precio;
 
-    public ItemDB(String name, String date, String amount) {
-        this.name = name;
-        this.date = date;
-        this.amount = amount;
+    public ItemDB(int id, String nombre, long fecha, long precio) {
+        this.id = id;
+        this.nombre = nombre;
+        this.fecha = fecha;
+        this.precio = precio;
+    }
+    public int getId() {
+        return id;
+    }
+    public String getNombre() {
+        return nombre;
     }
 
-    public String getName() {
-        return name;
+    public long getFecha() {
+        return fecha;
     }
 
-    public String getDate() {
-        return date;
+    public long getPrecio() {
+        return precio;
     }
 
-    public String getAmount() {
-        return amount;
-    }
+
 }
 

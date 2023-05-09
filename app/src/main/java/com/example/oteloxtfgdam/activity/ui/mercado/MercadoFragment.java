@@ -1,6 +1,7 @@
 package com.example.oteloxtfgdam.activity.ui.mercado;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,25 @@ import com.example.oteloxtfgdam.R;
 import com.example.oteloxtfgdam.databinding.FragmentMercadoBinding;
 import com.example.oteloxtfgdam.db.ItemDB;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MercadoFragment extends Fragment {
 
@@ -29,33 +47,76 @@ private FragmentMercadoBinding binding;
 
     binding = FragmentMercadoBinding.inflate(inflater, container, false);
     View root = binding.getRoot();
-        List<ItemDB> itemDBList = new ArrayList<>();
-        itemDBList.add(new ItemDB("Artículo 1", "01/01/2022", "$10.00"));
-        itemDBList.add(new ItemDB("Artículo 2", "02/02/2022", "$20.00"));
-        itemDBList.add(new ItemDB("Artículo 3", "03/03/2022", "$30.00"));
-        itemDBList.add(new ItemDB("Artículo 4", "04/04/2022", "$40.00"));
-        itemDBList.add(new ItemDB("Artículo 5", "05/05/2022", "$50.00"));
-        itemDBList.add(new ItemDB("Artículo 6", "06/06/2022", "$60.00"));
-        itemDBList.add(new ItemDB("Artículo 7", "07/07/2022", "$70.00"));
-        itemDBList.add(new ItemDB("Artículo 8", "08/08/2022", "$80.00"));
-        itemDBList.add(new ItemDB("Artículo 9", "09/09/2022", "$90.00"));
-        itemDBList.add(new ItemDB("Artículo 10", "10/10/2022", "$100.00"));
-        LinearLayout linearLayout = root.findViewById(R.id.linear_layout);
 
-        for (ItemDB itemDB : itemDBList) {
-            View itemView = inflater.inflate(R.layout.item_view, linearLayout, false);
-            ImageView itemIcon = itemView.findViewById(R.id.item_icon);
-            TextView itemName = itemView.findViewById(R.id.item_name);
-            TextView itemDate = itemView.findViewById(R.id.item_date);
-            TextView itemAmount = itemView.findViewById(R.id.item_amount);
+    List<ItemDB> items = new ArrayList<>();
+        OkHttpClient client = new OkHttpClient();
+        String url = "https://api.arsha.io/v2/eu/GetWorldMarketWaitList?lang=es";
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
 
-            itemIcon.setImageResource(R.drawable.outline_home_24);
-            itemName.setText(itemDB.getName());
-            itemDate.setText(itemDB.getDate());
-            itemAmount.setText(itemDB.getAmount());
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseBody = response.body().string();
+                    try {
+                        JSONArray jsonArray = new JSONArray(responseBody);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            int id = jsonObject.getInt("id");
+                            String nombre = jsonObject.getString("name");
+                            long precio = jsonObject.getLong("price");
+                            long fecha = jsonObject.getLong("liveAt");
+                            items.add(new ItemDB(id, nombre, fecha , precio));
+                        }
 
-            linearLayout.addView(itemView);
-        }
+
+                        // Aquí puedes utilizar la lista de personas como quieras
+                        LinearLayout linearLayout = root.findViewById(R.id.linear_layout);
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                for (ItemDB itemDB : items) {
+                                    View itemView = inflater.inflate(R.layout.item_view, linearLayout, false);
+                                    ImageView itemIcon = itemView.findViewById(R.id.item_icon);
+                                    TextView itemName = itemView.findViewById(R.id.item_name);
+                                    TextView itemDate = itemView.findViewById(R.id.item_date);
+                                    TextView itemAmount = itemView.findViewById(R.id.item_amount);
+
+                                    itemIcon.setImageResource(R.drawable.outline_home_24);
+                                    itemName.setText(itemDB.getNombre());
+                                    long millis = itemDB.getFecha() * 1000; // convertir segundos a milisegundos
+                                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM HH:mm"); // crear objeto SimpleDateFormat con el formato deseado
+                                    sdf.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+                                    String fechaFormateada = sdf.format(millis);
+                                    itemDate.setText(fechaFormateada);
+                                    DecimalFormat formatter = new DecimalFormat("#,###");
+                                    itemAmount.setText(formatter.format(itemDB.getPrecio()));
+
+                                    linearLayout.addView(itemView);
+                                }
+                            }
+                        });
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                } else {
+                    throw new IOException("Error al realizar la solicitud: " + response);
+                }
+            }
+        });
+
+
         return root;
     }
 
