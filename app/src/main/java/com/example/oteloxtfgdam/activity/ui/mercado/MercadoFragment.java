@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.oteloxtfgdam.R;
-import com.example.oteloxtfgdam.databinding.FragmentGalleryBinding;
+import com.example.oteloxtfgdam.databinding.FragmentMercadoBinding;
 import com.example.oteloxtfgdam.db.ItemDB;
 
 import java.util.ArrayList;
@@ -20,14 +20,14 @@ import java.util.List;
 
 public class MercadoFragment extends Fragment {
 
-private FragmentGalleryBinding binding;
+private FragmentMercadoBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
         MercadoViewModel mercadoViewModel =
                 new ViewModelProvider(this).get(MercadoViewModel.class);
 
-    binding = FragmentGalleryBinding.inflate(inflater, container, false);
+    binding = FragmentMercadoBinding.inflate(inflater, container, false);
     View root = binding.getRoot();
         List<ItemDB> itemDBList = new ArrayList<>();
         itemDBList.add(new ItemDB("Artículo 1", "01/01/2022", "$10.00"));
