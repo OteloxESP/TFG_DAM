@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
                     String usuario = mUsernameEditText.getText().toString();
                     String contraseña = mPasswordEditText.getText().toString();
                     Realm.init(v.getContext());
-                    String appID = "bdoinfo-wwrmh";
                     app = new App(new AppConfiguration.Builder(AppId).build());
                     if (app.currentUser() == null) {
                         Toast.makeText(v.getContext(), "user is null", Toast.LENGTH_SHORT).show();
@@ -157,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
                             SesionUsuario.getInstance(MainActivity.this).setUsuario(usuario);
                             Intent intent = new Intent(MainActivity.this, InicioActivity.class);
+                            intent.putExtra("app", (CharSequence) app);
                             startActivity(intent);
                             finish();
                         }
