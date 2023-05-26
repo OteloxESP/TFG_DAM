@@ -9,44 +9,75 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
+        android:padding="10dp"
+
         tools:ignore="MissingConstraints">
 
         <ImageView
             android:id="@+id/item_icon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="5dp"
             android:src="@drawable/outline_home_24"/>
 
         <LinearLayout
             android:id="@+id/list_item2"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp">
+            android:background="@color/gris_claro"
+            >
 
             <TextView
                 android:id="@+id/item_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nombre del objeto"/>
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingLeft="10dp"
+                android:text="Nombre del objeto" />
 
             <TextView
                 android:id="@+id/item_amount"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Fecha de transacción"/>
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:paddingLeft="10dp"
+                android:text="Precio" />
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/item_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="$10.00" />
 
+        <LinearLayout
+            android:id="@+id/list_item3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:orientation="vertical"
+            android:background="@color/gris_claro"
+            >
+
+            <TextView
+                android:id="@+id/item_date"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:paddingRight="7dp"
+                android:textAlignment="textEnd"
+                android:text="Dia" />
+
+            <TextView
+                android:id="@+id/item_date2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:paddingRight="7dp"
+                android:textAlignment="textEnd"
+                android:text="Hora" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

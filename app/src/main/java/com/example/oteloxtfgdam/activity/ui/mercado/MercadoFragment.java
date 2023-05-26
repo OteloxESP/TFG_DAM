@@ -1,8 +1,12 @@
 package com.example.oteloxtfgdam.activity.ui.mercado;
 
+import static androidx.core.content.ContextCompat.getDrawable;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+import android.app.ProgressDialog;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -77,6 +81,10 @@ public class MercadoFragment extends Fragment {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
+        ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Cargando items...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -95,9 +103,8 @@ public class MercadoFragment extends Fragment {
                             String nombre = jsonObject.getString("name");
                             long precio = jsonObject.getLong("price");
                             long fecha = jsonObject.getLong("liveAt");
-                            final String[] imagen = {"a"};
-                            AtomicReference<String> grado = new AtomicReference<>("");
-                            AtomicReference<String> imagenReference = new AtomicReference<>("bb");
+                            AtomicReference<String> grado = new AtomicReference<>("aa");
+                            AtomicReference<String> imagenReference = new AtomicReference<>("");
                             CountDownLatch latch = new CountDownLatch(1);
 
                             getActivity().runOnUiThread(new Runnable() {
@@ -124,13 +131,11 @@ public class MercadoFragment extends Fragment {
                                         if (task.isSuccess()) {
                                             ItemsDB result = task.get();
                                             if (result != null) {
-                                                // Accede a los campos del documento recuperado
+                                                // Accede a los campos
                                                 imagenReference.set(result.getImagen());
-
-                                                // Realiza las acciones deseadas con los campos recuperado
-                                                //Toast.makeText(getContext(), "Imagen: " + imagenReference.get(), Toast.LENGTH_SHORT).show();
+                                                grado.set(result.getGrado());
                                             } else {
-                                                Toast.makeText(getContext(), "No se encontró el documento", Toast.LENGTH_SHORT).show();
+                                                //Toast.makeText(getContext(), "No se encontró el documento", Toast.LENGTH_SHORT).show();
                                             }
                                         } else {
                                             Log.e("EXAMPLE", "Error al encontrar el documento: ", task.getError());
@@ -142,16 +147,12 @@ public class MercadoFragment extends Fragment {
                             try {
                                 latch.await(); // Espera hasta que findTask haya terminado
                             } catch (InterruptedException e) {
-                                // Manejo de la interrupción
-                            }
 
+                            }
+                            //Toast.makeText(getContext(), "ff"+grado.get(), Toast.LENGTH_SHORT).show();
                             items.add(new Item(new ObjectId(), nombre, fecha , precio, grado.get(), imagenReference.get()));
                         }
-
-
-                        // Aquí puedes utilizar la lista de personas como quieras
                         LinearLayout linearLayout = root.findViewById(R.id.linear_layout);
-
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -160,35 +161,54 @@ public class MercadoFragment extends Fragment {
                                     ImageView itemIcon = itemView.findViewById(R.id.item_icon);
                                     TextView itemName = itemView.findViewById(R.id.item_name);
                                     TextView itemDate = itemView.findViewById(R.id.item_date);
+                                    TextView itemDate2 = itemView.findViewById(R.id.item_date2);
                                     TextView itemAmount = itemView.findViewById(R.id.item_amount);
-                                    //Toast.makeText(getContext(), "imagen2"+item.getImagen(), Toast.LENGTH_SHORT).show();
-                                    // Cargar imagen utilizando Picasso
-                                    //Picasso.get().load("https://"+item.getImagen()).into(itemIcon);
+                                    final int version = android.os.Build.VERSION.SDK_INT;
+                                    if (item.getGrado().equals("4")){
+                                        if(version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                            itemIcon.setBackgroundDrawable( getDrawable(getContext(), R.drawable.image_border_red));
+                                            itemName.setTextColor(getResources().getColor(R.color.red));
+                                        } else {
+                                            itemIcon.setBackground( getDrawable(getContext(), R.drawable.image_border_red));
+                                            itemName.setTextColor(getResources().getColor(R.color.red));
+                                        }
+                                    } else if (item.getGrado().equals("3")) {
+                                        if(version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                            itemIcon.setBackgroundDrawable( getDrawable(getContext(), R.drawable.image_border_yellow));
+                                            itemName.setTextColor(getResources().getColor(R.color.yellow));
+                                        } else {
+                                            itemIcon.setBackground( getDrawable(getContext(), R.drawable.image_border_yellow));
+                                            itemName.setTextColor(getResources().getColor(R.color.yellow));
+                                        }
+                                    }
                                     Picasso.with( getContext() )
                                             .load( "https://"+item.getImagen() )
-                                            .error( R.drawable.outline_question_mark_24 )
+                                            .error( R.drawable.baseline_question_mark_24 )
                                             .placeholder( R.drawable.outline_downloading_24 )
                                             .into( itemIcon );
                                     itemName.setText(item.getNombre());
                                     long millis = item.getFecha() * 1000; // convertir segundos a milisegundos
-                                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM HH:mm"); // crear objeto SimpleDateFormat con el formato deseado
-                                    sdf.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
-                                    String fechaFormateada = sdf.format(millis);
+                                    SimpleDateFormat diaF = new SimpleDateFormat("dd-MM");
+                                    diaF.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+                                    String fechaFormateada = diaF.format(millis);
                                     itemDate.setText(fechaFormateada);
+                                    SimpleDateFormat horaF = new SimpleDateFormat("HH:mm");
+                                    horaF.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+                                    String fechaFormateada2 = horaF.format(millis);
+                                    itemDate2.setText(fechaFormateada2);
                                     DecimalFormat formatter = new DecimalFormat("#,###");
                                     itemAmount.setText(formatter.format(item.getPrecio()));
+                                    GradientDrawable shape =  new GradientDrawable();
+                                    Log.v("ddd", item.getGrado());
 
                                     linearLayout.addView(itemView);
                                 }
                             }
                         });
-
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-
+                    progressDialog.dismiss();
                 } else {
                     throw new IOException("Error al realizar la solicitud: " + response);
                 }
