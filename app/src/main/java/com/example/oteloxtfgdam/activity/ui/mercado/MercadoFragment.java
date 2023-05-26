@@ -163,7 +163,12 @@ public class MercadoFragment extends Fragment {
                                     TextView itemAmount = itemView.findViewById(R.id.item_amount);
                                     //Toast.makeText(getContext(), "imagen2"+item.getImagen(), Toast.LENGTH_SHORT).show();
                                     // Cargar imagen utilizando Picasso
-                                    Picasso.get().load("https://"+item.getImagen()).into(itemIcon);
+                                    //Picasso.get().load("https://"+item.getImagen()).into(itemIcon);
+                                    Picasso.with( getContext() )
+                                            .load( "https://"+item.getImagen() )
+                                            .error( R.drawable.outline_question_mark_24 )
+                                            .placeholder( R.drawable.outline_downloading_24 )
+                                            .into( itemIcon );
                                     itemName.setText(item.getNombre());
                                     long millis = item.getFecha() * 1000; // convertir segundos a milisegundos
                                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM HH:mm"); // crear objeto SimpleDateFormat con el formato deseado
