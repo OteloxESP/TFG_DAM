@@ -16,8 +16,9 @@
             android:id="@+id/profile_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds ="true"
             android:layout_margin="16dp"
-            android:src="@drawable/logo"
             android:layout_gravity="center_horizontal"
             android:clickable="true"
             android:onClick="selectImageFromGallery" />

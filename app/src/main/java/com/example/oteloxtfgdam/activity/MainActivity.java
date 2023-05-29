@@ -164,10 +164,9 @@ public class MainActivity extends AppCompatActivity {
                             mPasswordTextInputLayout.setError(null);
                             Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
 
-
                             // Guarda el estado de inicio de sesión
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putBoolean("isLoggedIn", true); // por ejemplo, puedes guardar un valor booleano
+                            editor.putBoolean("isLoggedIn", true);
                             editor.putString("user", usuario);
                             editor.putString("password", contraseña);
                             editor.apply();

@@ -5,8 +5,6 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import android.app.ProgressDialog;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -64,18 +61,16 @@ public class MercadoFragment extends Fragment {
     MongoClient mongoClient;
     MongoDatabase mongoDatabase;
     MongoCollection<Document> mongoCollection;
-    User user;
-    App app;
-    String AppId = "bdoinfo-wwrmh";
+
     public View onCreateView(@NonNull LayoutInflater inflater,
-            ViewGroup container, Bundle savedInstanceState) {
+                             ViewGroup container, Bundle savedInstanceState) {
         MercadoViewModel mercadoViewModel =
                 new ViewModelProvider(this).get(MercadoViewModel.class);
 
-    binding = FragmentMercadoBinding.inflate(inflater, container, false);
-    View root = binding.getRoot();
+        binding = FragmentMercadoBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
-    List<Item> items = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
         OkHttpClient client = new OkHttpClient();
         String url = "https://api.arsha.io/v2/eu/GetWorldMarketWaitList?lang=es";
         Request request = new Request.Builder()
@@ -150,7 +145,7 @@ public class MercadoFragment extends Fragment {
 
                             }
                             //Toast.makeText(getContext(), "ff"+grado.get(), Toast.LENGTH_SHORT).show();
-                            items.add(new Item(new ObjectId(), nombre, fecha , precio, grado.get(), imagenReference.get()));
+                            items.add(new Item(new ObjectId(), nombre, fecha, precio, grado.get(), imagenReference.get()));
                         }
                         LinearLayout linearLayout = root.findViewById(R.id.linear_layout);
                         getActivity().runOnUiThread(new Runnable() {
@@ -164,28 +159,28 @@ public class MercadoFragment extends Fragment {
                                     TextView itemDate2 = itemView.findViewById(R.id.item_date2);
                                     TextView itemAmount = itemView.findViewById(R.id.item_amount);
                                     final int version = android.os.Build.VERSION.SDK_INT;
-                                    if (item.getGrado().equals("4")){
-                                        if(version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                            itemIcon.setBackgroundDrawable( getDrawable(getContext(), R.drawable.image_border_red));
+                                    if (item.getGrado().equals("4")) {
+                                        if (version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                            itemIcon.setBackgroundDrawable(getDrawable(getContext(), R.drawable.image_border_red));
                                             itemName.setTextColor(getResources().getColor(R.color.red));
                                         } else {
-                                            itemIcon.setBackground( getDrawable(getContext(), R.drawable.image_border_red));
+                                            itemIcon.setBackground(getDrawable(getContext(), R.drawable.image_border_red));
                                             itemName.setTextColor(getResources().getColor(R.color.red));
                                         }
                                     } else if (item.getGrado().equals("3")) {
-                                        if(version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                            itemIcon.setBackgroundDrawable( getDrawable(getContext(), R.drawable.image_border_yellow));
+                                        if (version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                            itemIcon.setBackgroundDrawable(getDrawable(getContext(), R.drawable.image_border_yellow));
                                             itemName.setTextColor(getResources().getColor(R.color.yellow));
                                         } else {
-                                            itemIcon.setBackground( getDrawable(getContext(), R.drawable.image_border_yellow));
+                                            itemIcon.setBackground(getDrawable(getContext(), R.drawable.image_border_yellow));
                                             itemName.setTextColor(getResources().getColor(R.color.yellow));
                                         }
                                     }
-                                    Picasso.with( getContext() )
-                                            .load( "https://"+item.getImagen() )
-                                            .error( R.drawable.baseline_question_mark_24 )
-                                            .placeholder( R.drawable.outline_downloading_24 )
-                                            .into( itemIcon );
+                                    Picasso.with(getContext())
+                                            .load("https://" + item.getImagen())
+                                            .error(R.drawable.baseline_question_mark_24)
+                                            .placeholder(R.drawable.outline_downloading_24)
+                                            .into(itemIcon);
                                     itemName.setText(item.getNombre());
                                     long millis = item.getFecha() * 1000; // convertir segundos a milisegundos
                                     SimpleDateFormat diaF = new SimpleDateFormat("dd-MM");
@@ -198,8 +193,6 @@ public class MercadoFragment extends Fragment {
                                     itemDate2.setText(fechaFormateada2);
                                     DecimalFormat formatter = new DecimalFormat("#,###");
                                     itemAmount.setText(formatter.format(item.getPrecio()));
-                                    GradientDrawable shape =  new GradientDrawable();
-                                    Log.v("ddd", item.getGrado());
 
                                     linearLayout.addView(itemView);
                                 }
@@ -215,11 +208,10 @@ public class MercadoFragment extends Fragment {
             }
         });
 
-
         return root;
     }
 
-@Override
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;

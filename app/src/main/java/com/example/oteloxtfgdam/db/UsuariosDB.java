@@ -7,12 +7,11 @@ public class UsuariosDB {
     private String usuario;
     private String contraseña;
     private String email;
-    private int maestria_tala = 1000;
-    private int maestria_sangre = 1000;
-    private int maestria_hierbas = 1000;
-    private int maestria_carne = 1000;
-    private int maestria_minerales = 1000;
-    private int maestria_curtir = 1000;
+    private int maestriaTala;
+    private int maestriaSangre;
+    private int maestriaHierbas;
+    private int maestriaCarne;
+    private byte[] imagen;
 
     public UsuariosDB() {
 
@@ -29,12 +28,23 @@ public class UsuariosDB {
         this.usuario = usuario;
         this.contraseña = contraseña;
         this.email = email;
-        this.maestria_tala = 1000;
-        this.maestria_sangre = 1000;
-        this.maestria_hierbas = 1000;
-        this.maestria_carne = 1000;
-        this.maestria_minerales = 1000;
-        this.maestria_curtir = 1000;
+        this.maestriaTala = 1000;
+        this.maestriaSangre = 1000;
+        this.maestriaHierbas = 1000;
+        this.maestriaCarne = 1000;
+        this.imagen = new byte[0];
+    }
+
+    public UsuariosDB(ObjectId id, String usuario, String contraseña, String email, int tala, int sangre, int hierbas, int carne, byte[] imagen){
+        this.id = id;
+        this.usuario = usuario;
+        this.contraseña = contraseña;
+        this.email = email;
+        this.maestriaTala = tala;
+        this.maestriaSangre = sangre;
+        this.maestriaHierbas = hierbas;
+        this.maestriaCarne = carne;
+        this.imagen = imagen;
     }
 
     public ObjectId getId() {
@@ -69,51 +79,43 @@ public class UsuariosDB {
         this.email = email;
     }
 
-    public int getMaestria_tala() {
-        return maestria_tala;
+    public int getMaestriaTala() {
+        return maestriaTala;
     }
 
-    public void setMaestria_tala(int maestria_tala) {
-        this.maestria_tala = maestria_tala;
+    public void setMaestriaTala(int maestriaTala) {
+        this.maestriaTala = maestriaTala;
     }
 
-    public int getMaestria_sangre() {
-        return maestria_sangre;
+    public int getMaestriaSangre() {
+        return maestriaSangre;
     }
 
-    public void setMaestria_sangre(int maestria_sangre) {
-        this.maestria_sangre = maestria_sangre;
+    public void setMaestriaSangre(int maestriaSangre) {
+        this.maestriaSangre = maestriaSangre;
     }
 
-    public int getMaestria_hierbas() {
-        return maestria_hierbas;
+    public int getMaestriaHierbas() {
+        return maestriaHierbas;
     }
 
-    public void setMaestria_hierbas(int maestria_hierbas) {
-        this.maestria_hierbas = maestria_hierbas;
+    public void setMaestriaHierbas(int maestriaHierbas) {
+        this.maestriaHierbas = maestriaHierbas;
     }
 
-    public int getMaestria_carne() {
-        return maestria_carne;
+    public int getMaestriaCarne() {
+        return maestriaCarne;
     }
 
-    public void setMaestria_carne(int maestria_carne) {
-        this.maestria_carne = maestria_carne;
+    public void setMaestriaCarne(int maestriaCarne) {
+        this.maestriaCarne = maestriaCarne;
     }
 
-    public int getMaestria_minerales() {
-        return maestria_minerales;
+    public byte[] getImagen() {
+        return imagen;
     }
 
-    public void setMaestria_minerales(int maestria_minerales) {
-        this.maestria_minerales = maestria_minerales;
-    }
-
-    public int getMaestria_curtir() {
-        return maestria_curtir;
-    }
-
-    public void setMaestria_curtir(int maestria_curtir) {
-        this.maestria_curtir = maestria_curtir;
+    public void setImagen(byte[] imagen) {
+        this.imagen = imagen;
     }
 }

@@ -61,9 +61,5 @@ public class Item {
         return itemId;
     }
 
-    @Override
-    public String toString() {
-        return "Plant" + imagen+"]";
-    }
 }
 
