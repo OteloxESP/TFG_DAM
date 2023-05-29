@@ -1,6 +1,8 @@
 package com.example.oteloxtfgdam.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -12,7 +14,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.oteloxtfgdam.R;
-import com.example.oteloxtfgdam.SesionUsuario;
 import com.example.oteloxtfgdam.databinding.ActivityNavBinding;
 import com.google.android.material.navigation.NavigationView;
 
@@ -35,7 +36,10 @@ public class InicioActivity extends AppCompatActivity {
         salirItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                SesionUsuario.getInstance(InicioActivity.this).borrarSesion();
+                SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply();
                 Intent intent = new Intent(InicioActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();

@@ -7,8 +7,8 @@
     <string name="login">Login</string>
     <string name="username_required_error">Usuario requerido</string>
     <string name="password_required_error">Contraseña requerida</string>
-    <string name="username_incorrect">Este usuario no existe</string>
-    <string name="password_incorrect">Contraseña incorrecta</string>
+    <string name="username_incorrect">Credenciales incorrectas</string>
+    <string name="password_incorrect">Credenciales incorrectas</string>
     <string name="registration_success">Registro realizado</string>
     <string name="invalid_email">Email no valido</string>
     <string name="email_required">Email requerido</string>

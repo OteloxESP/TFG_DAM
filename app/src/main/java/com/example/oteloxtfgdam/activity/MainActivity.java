@@ -3,7 +3,9 @@ package com.example.oteloxtfgdam.activity;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,7 +17,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.oteloxtfgdam.R;
-import com.example.oteloxtfgdam.SesionUsuario;
 import com.example.oteloxtfgdam.db.UsuariosDB;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -53,11 +54,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (SesionUsuario.getInstance(this).estaLogueado()) {
-            Intent intent = new Intent(this, InicioActivity.class);
-            startActivity(intent);
+        // Obtén una instancia de SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+
+        // Obtén el estado de inicio de sesión desde SharedPreferences
+        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+
+        if (isLoggedIn) {
+            Intent loginIntent = new Intent(MainActivity.this, InicioActivity.class);
+            startActivity(loginIntent);
             finish();
         }
+
 
         mUsernameEditText = findViewById(R.id.username_edit_text);
         mPasswordEditText = findViewById(R.id.password_edit_text);
@@ -100,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     Realm.init(v.getContext());
                     app = new App(new AppConfiguration.Builder(AppId).build());
                     if (app.currentUser() == null) {
-                        Toast.makeText(v.getContext(), "user is null", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(v.getContext(), "user is null", Toast.LENGTH_SHORT).show();
                         app.loginAsync(Credentials.anonymous(), new App.Callback<User>() {
                             @Override
                             public void onResult(App.Result<User> result) {
@@ -108,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                                     initializeMongoDB(usuario, contraseña);
 
                                 } else {
-                                    Toast.makeText(MainActivity.this, "Failed to login", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "Algo ha salido mal", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -117,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+
             private void initializeMongoDB(String usuario, String contraseña) {
                 user = app.currentUser();
                 mongoClient = user.getMongoClient("mongodb-atlas");
@@ -139,9 +148,9 @@ public class MainActivity extends AppCompatActivity {
                             Log.v("EXAMPLE", "successfully found documents:");
                             while (results.hasNext()) {
                                 UsuariosDB u = results.next();
-                                if (usuario.equals(u.getUsuario())){
+                                if (usuario.equals(u.getUsuario())) {
                                     v = true;
-                                    if (BCrypt.checkpw(contraseña, u.getContraseña())){
+                                    if (BCrypt.checkpw(contraseña, u.getContraseña())) {
                                         v2 = true;
                                     }
                                 }
@@ -150,23 +159,25 @@ public class MainActivity extends AppCompatActivity {
                             Log.e("EXAMPLE", "failed to find documents with: ", task.getError());
                         }
 
-                        if (v && v2){
+                        if (v && v2) {
                             mUsernameTextInputLayout.setError(null);
                             mPasswordTextInputLayout.setError(null);
                             Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
-                            SesionUsuario.getInstance(MainActivity.this).setUsuario(usuario);
+
+
+                            // Guarda el estado de inicio de sesión
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putBoolean("isLoggedIn", true); // por ejemplo, puedes guardar un valor booleano
+                            editor.putString("user", usuario);
+                            editor.putString("password", contraseña);
+                            editor.apply();
                             Intent intent = new Intent(MainActivity.this, InicioActivity.class);
-                            intent.putExtra("app", (CharSequence) app);
                             startActivity(intent);
                             finish();
-                        }
-                        else if (!v && !v2)
-                        {
+                        } else if (!v || !v2) {
                             mUsernameTextInputLayout.setError(getString(R.string.username_incorrect));
                             mPasswordTextInputLayout.setError(getString(R.string.password_incorrect));
 
-                        } else if (v && !v2) {
-                            mPasswordTextInputLayout.setError(getString(R.string.password_incorrect));
                         }
 
                     } catch (Exception e) {
