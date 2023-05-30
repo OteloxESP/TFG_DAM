@@ -50,9 +50,9 @@ public class InicioActivity extends AppCompatActivity {
     MongoClient mongoClient;
     MongoDatabase mongoDatabase;
     MongoCollection<Document> mongoCollection;
-    ImageView imageView;
-    TextView titleTextView;
-    TextView subtitleTextView;
+    public ImageView imageView;
+    public TextView titleTextView;
+    public TextView subtitleTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

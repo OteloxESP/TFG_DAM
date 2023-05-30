@@ -187,28 +187,15 @@ public class PerfilFragment extends Fragment {
                                     .append("maestriaHierbas", usuario.getMaestriaHierbas())
                                     .append("maestriaCarne", usuario.getMaestriaCarne()));
                         }
-
-                        /*ActivityNavBinding binding2 = ActivityNavBinding.inflate(getLayoutInflater());
-                        NavigationView navigationView = binding2.navView;
-                        View header = navigationView.getHeaderView(0);
-                        ImageView imageView = header.findViewById(R.id.imageView);
-                        TextView titleTextView = header.findViewById(R.id.username_text_header);
-                        TextView subtitleTextView = header.findViewById(R.id.email_text_header);
-                        titleTextView.setText(usuario.getUsuario());
-                        subtitleTextView.setText(usuario.getEmail());
-                        InicioActivity i = new InicioActivity();
-
-                        titleTextView.setText(usuario.getUsuario());
-                        subtitleTextView.setText(usuario.getEmail());
-
+                        InicioActivity activity = (InicioActivity) getActivity();
                         if (usuario.getImagen()!=null){
                             byte[] imagenBytes = usuario.getImagen();
                             Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
-                            imageView.setImageBitmap(bitmap);
+                            activity.imageView.setImageBitmap(bitmap);
 
                         }else{
-                            imageView.setImageDrawable(getDrawable(getContext(), R.drawable.logo));
-                        }*/
+                            activity.imageView.setImageDrawable(getDrawable(getContext(), R.drawable.logo));
+                        }
 
                         mongoCollection.updateOne(queryFilter, updateDocument).getAsync(task2 -> {
                             if (task2.isSuccess()) {
