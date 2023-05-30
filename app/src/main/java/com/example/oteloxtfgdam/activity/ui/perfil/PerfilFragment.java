@@ -21,14 +21,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.oteloxtfgdam.MyApp;
 import com.example.oteloxtfgdam.R;
+import com.example.oteloxtfgdam.activity.InicioActivity;
+import com.example.oteloxtfgdam.databinding.ActivityNavBinding;
 import com.example.oteloxtfgdam.databinding.FragmentPerfilBinding;
 import com.example.oteloxtfgdam.db.UsuariosDB;
+import com.google.android.material.navigation.NavigationView;
 
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -69,7 +73,6 @@ public class PerfilFragment extends Fragment {
         progressDialog.show();
         binding = FragmentPerfilBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        EditText usernameEditText = binding.usernameEdittext;
         EditText talaEditText = binding.talaEditText;
         EditText sangreEditText = binding.sangreEditText;
         EditText hozEditText = binding.hozEditText;
@@ -93,8 +96,6 @@ public class PerfilFragment extends Fragment {
         RealmResultTask<MongoCursor<UsuariosDB>> findTask = mongoCollection.find().iterator();
         findTask.getAsync(task -> {
             try {
-                Boolean v = false;
-                Boolean v2 = false;
                 if (task.isSuccess()) {
                     MongoCursor<UsuariosDB> results = task.get();
                     Log.v("EXAMPLE", "successfully found documents:");
@@ -103,7 +104,6 @@ public class PerfilFragment extends Fragment {
                         if (username.equals(u.getUsuario())) {
                             if (BCrypt.checkpw(contraseña, u.getContraseña())) {
                                 usuario = u;
-                                usernameEditText.setText(usuario.getUsuario());
                                 String tala = String.valueOf(usuario.getMaestriaTala());
                                 String sangre = String.valueOf(usuario.getMaestriaSangre());
                                 String hierbas = String.valueOf(usuario.getMaestriaHierbas());
@@ -116,11 +116,12 @@ public class PerfilFragment extends Fragment {
                                 if (usuario.getImagen()!=null){
                                     byte[] imagenBytes = usuario.getImagen();
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
-                                    // Asigna el Bitmap a la ImageView
                                     binding.profileImage.setImageBitmap(bitmap);
+
                                 }else{
                                     binding.profileImage.setImageDrawable(getDrawable(getContext(), R.drawable.logo));
                                 }
+
                             }
                         }
                     }
@@ -165,7 +166,6 @@ public class PerfilFragment extends Fragment {
                             outputStream.close();
                         }
 
-                        usuario.setUsuario(usernameEditText.getText().toString());
                         usuario.setMaestriaTala(Integer.parseInt(talaEditText.getText().toString()));
                         usuario.setMaestriaSangre(Integer.parseInt(sangreEditText.getText().toString()));
                         usuario.setMaestriaHierbas(Integer.parseInt(hozEditText.getText().toString()));
@@ -187,6 +187,28 @@ public class PerfilFragment extends Fragment {
                                     .append("maestriaHierbas", usuario.getMaestriaHierbas())
                                     .append("maestriaCarne", usuario.getMaestriaCarne()));
                         }
+
+                        /*ActivityNavBinding binding2 = ActivityNavBinding.inflate(getLayoutInflater());
+                        NavigationView navigationView = binding2.navView;
+                        View header = navigationView.getHeaderView(0);
+                        ImageView imageView = header.findViewById(R.id.imageView);
+                        TextView titleTextView = header.findViewById(R.id.username_text_header);
+                        TextView subtitleTextView = header.findViewById(R.id.email_text_header);
+                        titleTextView.setText(usuario.getUsuario());
+                        subtitleTextView.setText(usuario.getEmail());
+                        InicioActivity i = new InicioActivity();
+
+                        titleTextView.setText(usuario.getUsuario());
+                        subtitleTextView.setText(usuario.getEmail());
+
+                        if (usuario.getImagen()!=null){
+                            byte[] imagenBytes = usuario.getImagen();
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
+                            imageView.setImageBitmap(bitmap);
+
+                        }else{
+                            imageView.setImageDrawable(getDrawable(getContext(), R.drawable.logo));
+                        }*/
 
                         mongoCollection.updateOne(queryFilter, updateDocument).getAsync(task2 -> {
                             if (task2.isSuccess()) {
