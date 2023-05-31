@@ -113,11 +113,10 @@ public class PerfilFragment extends Fragment {
                                 hozEditText.setText(hierbas);
                                 carneEditText.setText(carne);
 
-                                if (usuario.getImagen()!=null){
+                                if (usuario.getImagen().length>0){
                                     byte[] imagenBytes = usuario.getImagen();
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
                                     binding.profileImage.setImageBitmap(bitmap);
-
                                 }else{
                                     binding.profileImage.setImageDrawable(getDrawable(getContext(), R.drawable.logo));
                                 }

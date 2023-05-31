@@ -95,7 +95,7 @@ public class InicioActivity extends AppCompatActivity {
                                 titleTextView.setText(u.getUsuario());
                                 subtitleTextView.setText(u.getEmail());
 
-                                if (u.getImagen()!=null){
+                                if (u.getImagen().length>0){
                                     byte[] imagenBytes = u.getImagen();
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
                                     imageView.setImageBitmap(bitmap);
