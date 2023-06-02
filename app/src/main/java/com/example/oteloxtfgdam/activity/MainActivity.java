@@ -143,6 +143,11 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         Boolean v = false;
                         Boolean v2 = false;
+                        int tala = 0;
+                        int carne = 0;
+                        int hierbas = 0;
+                        int sangre = 0;
+
                         if (task.isSuccess()) {
                             MongoCursor<UsuariosDB> results = task.get();
                             Log.v("EXAMPLE", "successfully found documents:");
@@ -152,6 +157,10 @@ public class MainActivity extends AppCompatActivity {
                                     v = true;
                                     if (BCrypt.checkpw(contraseña, u.getContraseña())) {
                                         v2 = true;
+                                        tala = u.getMaestriaTala();
+                                        carne = u.getMaestriaCarne();
+                                        hierbas = u.getMaestriaHierbas();
+                                        sangre = u.getMaestriaSangre();
                                     }
                                 }
                             }
@@ -169,6 +178,10 @@ public class MainActivity extends AppCompatActivity {
                             editor.putBoolean("isLoggedIn", true);
                             editor.putString("user", usuario);
                             editor.putString("password", contraseña);
+                            editor.putInt("tala", tala);
+                            editor.putInt("hierbas", hierbas);
+                            editor.putInt("carne", carne);
+                            editor.putInt("sangre", sangre);
                             editor.apply();
                             Intent intent = new Intent(MainActivity.this, InicioActivity.class);
                             startActivity(intent);

@@ -1,99 +1,29 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.ui.home.HomeFragment" >
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:padding="10dp"
+        android:background="@color/negro_perso"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-            android:id="@+id/firstLinearLayout"
+            android:id="@+id/linear_layout_home"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:background="@drawable/rounded"
+            />
 
-            <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_lock_24" />
-
-            <TextView
-                android:id="@+id/textView14"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Campamento" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/secondLinearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/image32View4534"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_lock_24" />
-
-            <TextView
-                android:id="@+id/textView1712iou75"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10000" />
-            <ImageView
-                android:id="@+id/image34View4534"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_lock_24" />
-
-            <TextView
-                android:id="@+id/textVi434ew17iou75"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10000" />
-            <ImageView
-                android:id="@+id/imageV23iew4534"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_lock_24" />
-
-            <TextView
-                android:id="@+id/textVie432w17iou75"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10000" />
-            <ImageView
-                android:id="@+id/imageVie5w4534"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_lock_24" />
-
-            <TextView
-                android:id="@+id/textView1127iou75"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10000" />
-            <ImageView
-                android:id="@+id/imageView424534"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_lock_24" />
-
-            <TextView
-                android:id="@+id/textView127iou75"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10000" />
-
-        </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

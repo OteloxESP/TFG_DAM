@@ -202,6 +202,15 @@ public class PerfilFragment extends Fragment {
                                 long count = result.getModifiedCount();
                                 if (count == 1) {
                                     Log.v("EXAMPLE", "Documento actualizado correctamente");
+                                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putInt("tala", usuario.getMaestriaTala());
+                                    editor.putInt("hierbas", usuario.getMaestriaHierbas());
+                                    editor.putInt("carne", usuario.getMaestriaCarne());
+                                    editor.putInt("sangre", usuario.getMaestriaSangre());
+                                    editor.apply();
+
+
                                 } else if (count == 0) {
                                     Log.v("EXAMPLE", "No se encontró el documento para actualizar");
                                 } else {
