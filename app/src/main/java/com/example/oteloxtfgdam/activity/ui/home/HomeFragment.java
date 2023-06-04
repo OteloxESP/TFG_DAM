@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -50,8 +51,7 @@ public class HomeFragment extends Fragment {
     MongoClient mongoClient;
     MongoDatabase mongoDatabase;
     MongoCollection<Document> mongoCollection;
-    MongoCollection<Document> mongoCollection2;
-    UsuariosDB userActual;
+    LinearLayout linearLayout;
     int nivel = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -94,23 +94,52 @@ public class HomeFragment extends Fragment {
                     } else {
                         Log.e("EXAMPLE", "Error al encontrar el documento: ", task.getError());
                     }
-                    LinearLayout linearLayout = root.findViewById(R.id.linear_layout_home);
+
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             for (ZonasDB zona: zonas) {
+                                if (zona.getTipoZona().equals("Tala")){
+                                    linearLayout = root.findViewById(R.id.linear_layout_home_tala);
+                                } else if (zona.getTipoZona().equals("Hierbas")) {
+                                    linearLayout = root.findViewById(R.id.linear_layout_home_hierbas);
+                                } else if (zona.getTipoZona().equals("Sangre")) {
+                                    linearLayout = root.findViewById(R.id.linear_layout_home_sangre);
+                                }else{
+                                    linearLayout = root.findViewById(R.id.linear_layout_home_carne);
+                                }
                                 View zonaView = inflater.inflate(R.layout.zona_view, linearLayout, false);
                                 ImageView zonaIcon = zonaView.findViewById(R.id.zona_icon);
                                 ImageView item1Icon = zonaView.findViewById(R.id.item1_icon);
                                 ImageView item2Icon = zonaView.findViewById(R.id.item2_icon);
                                 ImageView item3Icon = zonaView.findViewById(R.id.item3_icon);
                                 ImageView item4Icon = zonaView.findViewById(R.id.item4_icon);
+
                                 if (zona.getTipoZona().equals("Tala")){
                                     zonaIcon.setImageDrawable(getDrawable(getContext(), R.drawable.tronco));
                                     item1Icon.setImageDrawable(getDrawable(getContext(),R.drawable.tronco));
                                     SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
                                     nivel = sharedPreferences.getInt("tala", 0)/50;
+
+                                } else if (zona.getTipoZona().equals("Hierbas")) {
+                                    zonaIcon.setImageDrawable(getDrawable(getContext(), R.drawable.hierbas));
+                                    item1Icon.setImageDrawable(getDrawable(getContext(),R.drawable.hierbas));
+                                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+                                    nivel = sharedPreferences.getInt("hierbas", 0)/50;
+
+                                } else if (zona.getTipoZona().equals("Sangre")) {
+                                    zonaIcon.setImageDrawable(getDrawable(getContext(), R.drawable.sangres));
+                                    item1Icon.setImageDrawable(getDrawable(getContext(),R.drawable.sangres));
+                                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+                                    nivel = sharedPreferences.getInt("sangre", 0)/50;
+
+                                }else{
+                                    zonaIcon.setImageDrawable(getDrawable(getContext(), R.drawable.carne));
+                                    item1Icon.setImageDrawable(getDrawable(getContext(),R.drawable.carne));
+                                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+                                    nivel = sharedPreferences.getInt("carne", 0)/50;
+
                                 }
 
                                 item2Icon.setImageDrawable(getDrawable(getContext(),R.drawable.polvo_espiritu));
@@ -131,7 +160,6 @@ public class HomeFragment extends Fragment {
                             }
                         }
                     });
-
                 });
                 progressDialog.dismiss();
             }
@@ -139,6 +167,14 @@ public class HomeFragment extends Fragment {
 
 
         return root;
+    }
+
+    private void showErrorMensaje(String mensaje) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Error")
+                .setMessage(mensaje)
+                .setPositiveButton("Aceptar", null)
+                .show();
     }
 
     @Override

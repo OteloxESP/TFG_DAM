@@ -15,14 +15,41 @@
         android:padding="10dp"
         android:background="@color/negro_perso"
         app:layout_constraintEnd_toEndOf="parent">
-
         <LinearLayout
-            android:id="@+id/linear_layout_home"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/rounded"
-            />
+            android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/linear_layout_home_tala"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/rounded" />
+            <LinearLayout
+                android:id="@+id/linear_layout_home_hierbas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:orientation="vertical"
+                android:background="@drawable/rounded" />
+            <LinearLayout
+                android:id="@+id/linear_layout_home_carne"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:orientation="vertical"
+                android:background="@drawable/rounded" />
+            <LinearLayout
+                android:id="@+id/linear_layout_home_sangre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:orientation="vertical"
+                android:background="@drawable/rounded" />
+
+        </LinearLayout>
+
 
     </ScrollView>
 

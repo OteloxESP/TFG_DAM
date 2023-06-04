@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -84,6 +85,8 @@ public class MercadoFragment extends Fragment {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                progressDialog.dismiss();
+                showErrorMensaje("Error de red. Por favor, comprueba tu conexión a internet.");
             }
 
             @Override
@@ -134,6 +137,8 @@ public class MercadoFragment extends Fragment {
                                             }
                                         } else {
                                             Log.e("EXAMPLE", "Error al encontrar el documento: ", task.getError());
+                                            progressDialog.dismiss();
+                                            showErrorMensaje("Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                                         }
                                         latch.countDown();
                                     });
@@ -142,9 +147,8 @@ public class MercadoFragment extends Fragment {
                             try {
                                 latch.await(); // Espera hasta que findTask haya terminado
                             } catch (InterruptedException e) {
-
+                                e.printStackTrace();
                             }
-                            //Toast.makeText(getContext(), "ff"+grado.get(), Toast.LENGTH_SHORT).show();
                             items.add(new Item(new ObjectId(), nombre, fecha, precio, grado.get(), imagenReference.get()));
                         }
                         LinearLayout linearLayout = root.findViewById(R.id.linear_layout);
@@ -200,15 +204,30 @@ public class MercadoFragment extends Fragment {
                         });
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        progressDialog.dismiss();
+                        showErrorMensaje("Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                     }
                     progressDialog.dismiss();
                 } else {
-                    throw new IOException("Error al realizar la solicitud: " + response);
+                    progressDialog.dismiss();
+                    showErrorMensaje("Error al realizar la solicitud. Por favor, inténtalo de nuevo más tarde.");
                 }
             }
         });
-
         return root;
+    }
+
+    private void showErrorMensaje(String mensaje) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Error")
+                        .setMessage(mensaje)
+                        .setPositiveButton("Aceptar", null)
+                        .show();
+            }
+        });
     }
 
     @Override
