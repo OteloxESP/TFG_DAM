@@ -21,15 +21,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.oteloxtfgdam.MyApp;
 import com.example.oteloxtfgdam.R;
 import com.example.oteloxtfgdam.activity.InicioActivity;
-import com.example.oteloxtfgdam.databinding.ActivityNavBinding;
 import com.example.oteloxtfgdam.databinding.FragmentPerfilBinding;
 import com.example.oteloxtfgdam.db.UsuariosDB;
 import com.google.android.material.navigation.NavigationView;
@@ -113,14 +113,13 @@ public class PerfilFragment extends Fragment {
                                 hozEditText.setText(hierbas);
                                 carneEditText.setText(carne);
 
-                                if (usuario.getImagen().length>0){
+                                if (usuario.getImagen() != null && usuario.getImagen().length > 0) {
                                     byte[] imagenBytes = usuario.getImagen();
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
                                     binding.profileImage.setImageBitmap(bitmap);
-                                }else{
+                                } else {
                                     binding.profileImage.setImageDrawable(getDrawable(getContext(), R.drawable.logo));
                                 }
-
                             }
                         }
                     }
@@ -129,7 +128,9 @@ public class PerfilFragment extends Fragment {
                     Log.e("EXAMPLE", "failed to find documents with: ", task.getError());
                 }
             } catch (Exception e) {
-                throw new RuntimeException();
+                progressDialog.dismiss();
+                showErrorMensaje("Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
+                e.printStackTrace();
             }
         });
 
@@ -187,12 +188,11 @@ public class PerfilFragment extends Fragment {
                                     .append("maestriaCarne", usuario.getMaestriaCarne()));
                         }
                         InicioActivity activity = (InicioActivity) getActivity();
-                        if (usuario.getImagen()!=null){
+                        if (usuario.getImagen() != null && usuario.getImagen().length > 0) {
                             byte[] imagenBytes = usuario.getImagen();
                             Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
                             activity.imageView.setImageBitmap(bitmap);
-
-                        }else{
+                        } else {
                             activity.imageView.setImageDrawable(getDrawable(getContext(), R.drawable.logo));
                         }
 
@@ -209,8 +209,8 @@ public class PerfilFragment extends Fragment {
                                     editor.putInt("carne", usuario.getMaestriaCarne());
                                     editor.putInt("sangre", usuario.getMaestriaSangre());
                                     editor.apply();
-
-
+                                    Toast.makeText(activity, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
+                                    
                                 } else if (count == 0) {
                                     Log.v("EXAMPLE", "No se encontró el documento para actualizar");
                                 } else {
@@ -218,16 +218,22 @@ public class PerfilFragment extends Fragment {
                                 }
                             } else {
                                 Log.e("EXAMPLE", "Error al actualizar el documento: ", task2.getError());
+                                showErrorMensaje("Error al actualizar el perfil. Por favor, inténtalo de nuevo más tarde.");
                             }
                         });
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        showErrorMensaje("Error al acceder a la imagen seleccionada. Por favor, selecciona otra imagen.");
+                        e.printStackTrace();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        showErrorMensaje("Error al procesar la imagen seleccionada. Por favor, selecciona otra imagen.");
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        showErrorMensaje("Error al actualizar el perfil. Por favor, inténtalo de nuevo más tarde.");
+                        e.printStackTrace();
                     }
+                } else {
+                    showErrorMensaje("No se pudo encontrar el usuario. Por favor, vuelve a iniciar sesión.");
                 }
-
-
             }
         });
 
@@ -247,8 +253,20 @@ public class PerfilFragment extends Fragment {
             nuevaFoto = true;
             ImageView imagenPreview = binding.profileImage;
             imagenPreview.setImageURI(imagenActual);
-
         }
+    }
+
+    private void showErrorMensaje(String mensaje) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Error")
+                        .setMessage(mensaje)
+                        .setPositiveButton("Aceptar", null)
+                        .show();
+            }
+        });
     }
 
     @Override

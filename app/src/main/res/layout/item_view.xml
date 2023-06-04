@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
-
         tools:ignore="MissingConstraints">
 
         <ImageView
@@ -37,7 +36,8 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:paddingLeft="10dp"
-                android:text="Nombre del objeto" />
+                android:text="Nombre del objeto"
+                android:textColor="@color/white"/>
 
             <TextView
                 android:id="@+id/item_amount"
@@ -45,7 +45,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
                 android:paddingLeft="10dp"
-                android:text="Precio" />
+                android:text="Precio"
+                android:textColor="@color/white"/>
 
         </LinearLayout>
 
@@ -66,7 +67,8 @@
                 android:layout_weight="0.5"
                 android:paddingRight="7dp"
                 android:textAlignment="textEnd"
-                android:text="Dia" />
+                android:text="Dia"
+                android:textColor="@color/white"/>
 
             <TextView
                 android:id="@+id/item_date2"
@@ -75,7 +77,8 @@
                 android:layout_weight="0.5"
                 android:paddingRight="7dp"
                 android:textAlignment="textEnd"
-                android:text="Hora" />
+                android:text="Hora"
+                android:textColor="@color/white"/>
 
         </LinearLayout>
     </LinearLayout>

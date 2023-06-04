@@ -32,6 +32,7 @@
             android:layout_marginTop="32dp"
             android:text="@string/recoleccion_section_header"
             android:textAlignment="center"
+            android:textColor="@color/white"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -41,7 +42,8 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:hint="@string/tala_input_hint">
+            android:hint="@string/tala_input_hint"
+            android:textColor="@color/white">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/tala_edit_text"
@@ -62,7 +64,8 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:hint="@string/sangre_input_hint">
+            android:hint="@string/sangre_input_hint"
+            android:textColor="@color/white">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/sangre_edit_text"
@@ -93,7 +96,8 @@
                 android:digits="0123456789"
                 android:maxLength="5"
                 android:imeOptions="actionNext"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textColor="@color/white"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -117,7 +121,8 @@
                 android:imeOptions="actionNext"
                 android:clickable="true"
                 android:focusableInTouchMode="true"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textColor="@color/white"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 

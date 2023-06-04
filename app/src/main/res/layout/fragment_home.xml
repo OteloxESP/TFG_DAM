@@ -19,13 +19,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <LinearLayout
                 android:id="@+id/linear_layout_home_tala"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="10dp"
-                android:background="@drawable/rounded" />
+                android:background="@drawable/rounded"/>
             <LinearLayout
                 android:id="@+id/linear_layout_home_hierbas"
                 android:layout_width="match_parent"
