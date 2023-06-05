@@ -33,6 +33,7 @@ import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -62,6 +63,8 @@ public class MercadoFragment extends Fragment {
     MongoClient mongoClient;
     MongoDatabase mongoDatabase;
     MongoCollection<Document> mongoCollection;
+    List<Item> items = new ArrayList<>();
+    ProgressDialog progressDialog;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -71,7 +74,7 @@ public class MercadoFragment extends Fragment {
         binding = FragmentMercadoBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        List<Item> items = new ArrayList<>();
+
         OkHttpClient client = new OkHttpClient();
         String url = "https://api.arsha.io/v2/eu/GetWorldMarketWaitList?lang=es";
         Request request = new Request.Builder()
@@ -86,7 +89,7 @@ public class MercadoFragment extends Fragment {
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
                 progressDialog.dismiss();
-                showErrorMensaje("Error de red. Por favor, comprueba tu conexión a internet.");
+                showMensaje("Error","Error de red. Por favor, comprueba tu conexión a internet.");
             }
 
             @Override
@@ -94,142 +97,166 @@ public class MercadoFragment extends Fragment {
                 if (response.isSuccessful()) {
                     String responseBody = response.body().string();
                     try {
-                        JSONArray jsonArray = new JSONArray(responseBody);
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            String id = String.valueOf(jsonObject.getInt("id"));
-                            String nombre = jsonObject.getString("name");
-                            long precio = jsonObject.getLong("price");
-                            long fecha = jsonObject.getLong("liveAt");
-                            AtomicReference<String> grado = new AtomicReference<>("aa");
-                            AtomicReference<String> imagenReference = new AtomicReference<>("");
-                            CountDownLatch latch = new CountDownLatch(1);
-
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    App app = MyApp.getAppInstance();
-                                    User user = app.currentUser();
-
-                                    mongoClient = user.getMongoClient("mongodb-atlas");
-                                    mongoDatabase = mongoClient.getDatabase("bdoHelp");
-                                    mongoCollection = mongoDatabase.getCollection("Items");
-                                    CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY,
-                                            fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-                                    MongoCollection<ItemsDB> mongoCollection =
-                                            mongoDatabase.getCollection(
-                                                    "Items",
-                                                    ItemsDB.class).withCodecRegistry(pojoCodecRegistry);
-
-                                    Document queryFilter = null;
-                                    queryFilter = new Document("itemId", id);
-
-                                    RealmResultTask<ItemsDB> findTask = mongoCollection.findOne(queryFilter);
-                                    findTask.getAsync(task -> {
-                                        if (task.isSuccess()) {
-                                            ItemsDB result = task.get();
-                                            if (result != null) {
-                                                // Accede a los campos
-                                                imagenReference.set(result.getImagen());
-                                                grado.set(result.getGrado());
-                                            } else {
-                                                //Toast.makeText(getContext(), "No se encontró el documento", Toast.LENGTH_SHORT).show();
-                                            }
-                                        } else {
-                                            Log.e("EXAMPLE", "Error al encontrar el documento: ", task.getError());
-                                            progressDialog.dismiss();
-                                            showErrorMensaje("Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
-                                        }
-                                        latch.countDown();
-                                    });
-                                }
-                            });
-                            try {
-                                latch.await(); // Espera hasta que findTask haya terminado
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                        Object json = new JSONTokener(responseBody).nextValue();
+                        if (json instanceof JSONArray) {
+                            JSONArray jsonArray = (JSONArray) json;
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                procesarJSON(jsonObject);
                             }
-                            items.add(new Item(new ObjectId(), nombre, fecha, precio, grado.get(), imagenReference.get()));
+                        } else if (json instanceof JSONObject) {
+                            JSONObject jsonObject = (JSONObject) json;
+                            procesarJSON(jsonObject);
+                        } else {
+                            progressDialog.dismiss();
+                            showMensaje("Error","La respuesta del servidor no es válida.");
                         }
-                        LinearLayout linearLayout = root.findViewById(R.id.linear_layout);
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                for (Item item : items) {
-                                    View itemView = inflater.inflate(R.layout.item_view, linearLayout, false);
-                                    ImageView itemIcon = itemView.findViewById(R.id.item_icon);
-                                    TextView itemName = itemView.findViewById(R.id.item_name);
-                                    TextView itemDate = itemView.findViewById(R.id.item_date);
-                                    TextView itemDate2 = itemView.findViewById(R.id.item_date2);
-                                    TextView itemAmount = itemView.findViewById(R.id.item_amount);
-                                    final int version = android.os.Build.VERSION.SDK_INT;
-                                    if (item.getGrado().equals("4")) {
-                                        if (version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                            itemIcon.setBackgroundDrawable(getDrawable(getContext(), R.drawable.image_border_red));
-                                            itemName.setTextColor(getResources().getColor(R.color.red));
-                                        } else {
-                                            itemIcon.setBackground(getDrawable(getContext(), R.drawable.image_border_red));
-                                            itemName.setTextColor(getResources().getColor(R.color.red));
-                                        }
-                                    } else if (item.getGrado().equals("3")) {
-                                        if (version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                            itemIcon.setBackgroundDrawable(getDrawable(getContext(), R.drawable.image_border_yellow));
-                                            itemName.setTextColor(getResources().getColor(R.color.yellow));
-                                        } else {
-                                            itemIcon.setBackground(getDrawable(getContext(), R.drawable.image_border_yellow));
-                                            itemName.setTextColor(getResources().getColor(R.color.yellow));
-                                        }
-                                    }
-                                    Picasso.with(getContext())
-                                            .load("https://" + item.getImagen())
-                                            .error(R.drawable.baseline_question_mark_24)
-                                            .placeholder(R.drawable.outline_downloading_24)
-                                            .into(itemIcon);
-                                    itemName.setText(item.getNombre());
-                                    long millis = item.getFecha() * 1000; // convertir segundos a milisegundos
-                                    SimpleDateFormat diaF = new SimpleDateFormat("dd-MM");
-                                    diaF.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
-                                    String fechaFormateada = diaF.format(millis);
-                                    itemDate.setText(fechaFormateada);
-                                    SimpleDateFormat horaF = new SimpleDateFormat("HH:mm");
-                                    horaF.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
-                                    String fechaFormateada2 = horaF.format(millis);
-                                    itemDate2.setText(fechaFormateada2);
-                                    DecimalFormat formatter = new DecimalFormat("#,###");
-                                    itemAmount.setText(formatter.format(item.getPrecio()));
-
-                                    linearLayout.addView(itemView);
-                                }
-                            }
-                        });
                     } catch (JSONException e) {
                         e.printStackTrace();
                         progressDialog.dismiss();
-                        showErrorMensaje("Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
+                        showMensaje("Error","Error al procesar la respuesta del servidor.");
                     }
+
+                    LinearLayout linearLayout = root.findViewById(R.id.linear_layout);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (Item item : items) {
+                                View itemView = inflater.inflate(R.layout.item_view, linearLayout, false);
+                                ImageView itemIcon = itemView.findViewById(R.id.item_icon);
+                                TextView itemName = itemView.findViewById(R.id.item_name);
+                                TextView itemDate = itemView.findViewById(R.id.item_date);
+                                TextView itemDate2 = itemView.findViewById(R.id.item_date2);
+                                TextView itemAmount = itemView.findViewById(R.id.item_amount);
+                                final int version = android.os.Build.VERSION.SDK_INT;
+                                if (item.getGrado().equals("4")) {
+                                    if (version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                        itemIcon.setBackgroundDrawable(getDrawable(getContext(), R.drawable.image_border_red));
+                                        itemName.setTextColor(getResources().getColor(R.color.red));
+                                    } else {
+                                        itemIcon.setBackground(getDrawable(getContext(), R.drawable.image_border_red));
+                                        itemName.setTextColor(getResources().getColor(R.color.red));
+                                    }
+                                } else if (item.getGrado().equals("3")) {
+                                    if (version < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                        itemIcon.setBackgroundDrawable(getDrawable(getContext(), R.drawable.image_border_yellow));
+                                        itemName.setTextColor(getResources().getColor(R.color.yellow));
+                                    } else {
+                                        itemIcon.setBackground(getDrawable(getContext(), R.drawable.image_border_yellow));
+                                        itemName.setTextColor(getResources().getColor(R.color.yellow));
+                                    }
+                                }
+                                Picasso.with(getContext())
+                                        .load("https://" + item.getImagen())
+                                        .error(R.drawable.baseline_question_mark_24)
+                                        .placeholder(R.drawable.outline_downloading_24)
+                                        .into(itemIcon);
+                                itemName.setText(item.getNombre());
+                                long millis = item.getFecha() * 1000; // convertir segundos a milisegundos
+                                SimpleDateFormat diaF = new SimpleDateFormat("dd-MM");
+                                diaF.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+                                String fechaFormateada = diaF.format(millis);
+                                itemDate.setText(fechaFormateada);
+                                SimpleDateFormat horaF = new SimpleDateFormat("HH:mm");
+                                horaF.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+                                String fechaFormateada2 = horaF.format(millis);
+                                itemDate2.setText(fechaFormateada2);
+                                DecimalFormat formatter = new DecimalFormat("#,###");
+                                itemAmount.setText(formatter.format(item.getPrecio()));
+
+                                linearLayout.addView(itemView);
+                            }
+                        }
+                    });
                     progressDialog.dismiss();
                 } else {
                     progressDialog.dismiss();
-                    showErrorMensaje("Error al realizar la solicitud. Por favor, inténtalo de nuevo más tarde.");
+                    Log.e("Error llamada",response.body()+"");
+                    if (response.code()==515){
+                        showMensaje("Atención","No hay items en la lista de espera en estos momentos");
+                    }else{
+                        showMensaje("Error","Error al realizar la solicitud. Por favor, inténtalo de nuevo más tarde.");
+                    }
                 }
             }
         });
         return root;
     }
 
-    private void showErrorMensaje(String mensaje) {
+    public void procesarJSON(JSONObject jsonObject){
+        try{
+            String id = String.valueOf(jsonObject.getInt("id"));
+            String nombre = jsonObject.getString("name");
+            long precio = jsonObject.getLong("price");
+            long fecha = jsonObject.getLong("liveAt");
+            AtomicReference<String> grado = new AtomicReference<>("");
+            AtomicReference<String> imagenReference = new AtomicReference<>("");
+            CountDownLatch latch = new CountDownLatch(1);
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    App app = MyApp.getAppInstance();
+                    User user = app.currentUser();
+
+                    mongoClient = user.getMongoClient("mongodb-atlas");
+                    mongoDatabase = mongoClient.getDatabase("bdoHelp");
+                    mongoCollection = mongoDatabase.getCollection("Items");
+                    CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY,
+                            fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+                    MongoCollection<ItemsDB> mongoCollection =
+                            mongoDatabase.getCollection(
+                                    "Items",
+                                    ItemsDB.class).withCodecRegistry(pojoCodecRegistry);
+
+                    Document queryFilter = null;
+                    queryFilter = new Document("itemId", id);
+
+                    RealmResultTask<ItemsDB> findTask = mongoCollection.findOne(queryFilter);
+                    findTask.getAsync(task -> {
+                        if (task.isSuccess()) {
+                            ItemsDB result = task.get();
+                            if (result != null) {
+                                // Accede a los campos
+                                imagenReference.set(result.getImagen());
+                                grado.set(result.getGrado());
+                            } else {
+                                //Toast.makeText(getContext(), "No se encontró el documento", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Log.e("EXAMPLE", "Error al encontrar el documento: ", task.getError());
+                            progressDialog.dismiss();
+                            showMensaje("Error","Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
+                        }
+                        latch.countDown();
+                    });
+                }
+            });
+            try {
+                latch.await(); // Espera hasta que findTask haya terminado
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            items.add(new Item(new ObjectId(), nombre, fecha, precio, grado.get(), imagenReference.get()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            progressDialog.dismiss();
+            showMensaje("Error","Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
+        }
+
+    }
+    private void showMensaje(String titulo, String mensaje) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Error")
+                builder.setTitle(titulo)
                         .setMessage(mensaje)
                         .setPositiveButton("Aceptar", null)
                         .show();
             }
         });
     }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
