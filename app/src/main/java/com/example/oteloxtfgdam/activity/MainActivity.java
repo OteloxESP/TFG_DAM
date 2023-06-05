@@ -1,8 +1,6 @@
 package com.example.oteloxtfgdam.activity;
 
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,28 +10,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.oteloxtfgdam.R;
+import com.example.oteloxtfgdam.db.DbManager;
 import com.example.oteloxtfgdam.db.UsuariosDB;
 import com.google.android.material.textfield.TextInputLayout;
 
-import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.mindrot.jbcrypt.BCrypt;
 
-import io.realm.Realm;
-import io.realm.mongodb.App;
-import io.realm.mongodb.AppConfiguration;
-import io.realm.mongodb.Credentials;
 import io.realm.mongodb.RealmResultTask;
-import io.realm.mongodb.User;
-import io.realm.mongodb.mongo.MongoClient;
 import io.realm.mongodb.mongo.MongoCollection;
-import io.realm.mongodb.mongo.MongoDatabase;
 import io.realm.mongodb.mongo.iterable.MongoCursor;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,13 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText mPasswordEditText;
     private TextInputLayout mUsernameTextInputLayout;
     private TextInputLayout mPasswordTextInputLayout;
-    Realm uiThreadRealm;
-    MongoClient mongoClient;
-    MongoDatabase mongoDatabase;
-    MongoCollection<Document> mongoCollection;
-    User user;
-    App app;
-    String AppId = "bdoinfo-wwrmh";
+    MongoCollection<UsuariosDB> mongoCollection;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,39 +89,17 @@ public class MainActivity extends AppCompatActivity {
                 if (isValid) {
                     String usuario = mUsernameEditText.getText().toString();
                     String contraseña = mPasswordEditText.getText().toString();
-                    Realm.init(v.getContext());
-                    app = new App(new AppConfiguration.Builder(AppId).build());
-                    if (app.currentUser() == null) {
-                        //Toast.makeText(v.getContext(), "user is null", Toast.LENGTH_SHORT).show();
-                        app.loginAsync(Credentials.anonymous(), new App.Callback<User>() {
-                            @Override
-                            public void onResult(App.Result<User> result) {
-                                if (result.isSuccess()) {
-                                    initializeMongoDB(usuario, contraseña);
-
-                                } else {
-                                    Toast.makeText(MainActivity.this, "Algo ha salido mal", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-                    } else {
-                        initializeMongoDB(usuario, contraseña);
-                    }
+                    initializeMongoDB(usuario, contraseña);
                 }
             }
 
             private void initializeMongoDB(String usuario, String contraseña) {
-                user = app.currentUser();
-                mongoClient = user.getMongoClient("mongodb-atlas");
-                mongoDatabase = mongoClient.getDatabase("bdoHelp");
-                mongoCollection = mongoDatabase.getCollection("Usuarios");
-                CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY,
-                        fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-                MongoCollection<UsuariosDB> mongoCollection =
-                        mongoDatabase.getCollection(
-                                "Usuarios",
-                                UsuariosDB.class).withCodecRegistry(pojoCodecRegistry);
-
+                progressDialog = new ProgressDialog(MainActivity.this);
+                progressDialog.setMessage("Iniciando sesión...");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+                DbManager db = new DbManager();
+                mongoCollection = db.obtenerUsuariosCollection();
                 RealmResultTask<MongoCursor<UsuariosDB>> findTask = mongoCollection.find().iterator();
                 findTask.getAsync(task -> {
                     try {
@@ -165,14 +127,14 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         } else {
+                            progressDialog.dismiss();
                             Log.e("EXAMPLE", "failed to find documents with: ", task.getError());
+                            showMensaje("Error", "Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                         }
 
                         if (v && v2) {
                             mUsernameTextInputLayout.setError(null);
                             mPasswordTextInputLayout.setError(null);
-                            Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();
-
                             // Guarda el estado de inicio de sesión
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             editor.putBoolean("isLoggedIn", true);
@@ -186,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                             Intent intent = new Intent(MainActivity.this, InicioActivity.class);
                             startActivity(intent);
                             finish();
+
                         } else if (!v || !v2) {
                             mUsernameTextInputLayout.setError(getString(R.string.username_incorrect));
                             mPasswordTextInputLayout.setError(getString(R.string.password_incorrect));
@@ -193,11 +156,27 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                     } catch (Exception e) {
+                        progressDialog.dismiss();
                         Log.e("EXAMPLE", "Error during find task: ", e);
+                        showMensaje("Error", "Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                     }
                 });
             }
         });
 
     }
+
+    private void showMensaje(String titulo, String mensaje) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                builder.setTitle(titulo)
+                        .setMessage(mensaje)
+                        .setPositiveButton("Aceptar", null)
+                        .show();
+            }
+        });
+    }
 }
+

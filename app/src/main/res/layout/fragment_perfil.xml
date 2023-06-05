@@ -13,17 +13,31 @@
         android:orientation="vertical"
         android:background="@color/negro_perso"
         android:gravity="center_horizontal">
-
-        <ImageView
-            android:id="@+id/profile_image"
+        <FrameLayout
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:scaleType="centerCrop"
-            android:adjustViewBounds ="true"
             android:layout_margin="16dp"
-            android:layout_gravity="center_horizontal"
             android:clickable="true"
-            android:onClick="selectImageFromGallery" />
+            android:onClick="selectImageFromGallery">
+
+            <ImageView
+                android:id="@+id/profile_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:foreground="?android:attr/selectableItemBackground"/>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/outline_mode_edit_outline_24"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:clickable="false"
+                android:focusable="false" />
+        </FrameLayout>
 
         <TextView
             android:id="@+id/recoleccion_section_header"

@@ -1,9 +1,5 @@
 package com.example.oteloxtfgdam.activity;
 
-import static androidx.core.content.ContextCompat.getDrawable;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -23,33 +20,23 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.oteloxtfgdam.MyApp;
 import com.example.oteloxtfgdam.R;
 import com.example.oteloxtfgdam.databinding.ActivityNavBinding;
+import com.example.oteloxtfgdam.db.DbManager;
 import com.example.oteloxtfgdam.db.UsuariosDB;
 import com.google.android.material.navigation.NavigationView;
 
-import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.mindrot.jbcrypt.BCrypt;
 
-import io.realm.mongodb.App;
-import io.realm.mongodb.AppConfiguration;
 import io.realm.mongodb.RealmResultTask;
-import io.realm.mongodb.User;
-import io.realm.mongodb.mongo.MongoClient;
 import io.realm.mongodb.mongo.MongoCollection;
-import io.realm.mongodb.mongo.MongoDatabase;
 import io.realm.mongodb.mongo.iterable.MongoCursor;
 
 public class InicioActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityNavBinding binding;
-    MongoClient mongoClient;
-    MongoDatabase mongoDatabase;
-    MongoCollection<Document> mongoCollection;
+    MongoCollection<UsuariosDB> mongoCollection;
     public ImageView imageView;
     public TextView titleTextView;
     public TextView subtitleTextView;
@@ -68,20 +55,11 @@ public class InicioActivity extends AppCompatActivity {
         titleTextView = header.findViewById(R.id.username_text_header);
         subtitleTextView = header.findViewById(R.id.email_text_header);
 
-        App app = MyApp.getAppInstance();
-        User user = app.currentUser();
-        mongoClient = user.getMongoClient("mongodb-atlas");
-        mongoDatabase = mongoClient.getDatabase("bdoHelp");
-        mongoCollection = mongoDatabase.getCollection("Usuarios");
-        CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY,
-                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-        MongoCollection<UsuariosDB> mongoCollection =
-                mongoDatabase.getCollection(
-                        "Usuarios",
-                        UsuariosDB.class).withCodecRegistry(pojoCodecRegistry);
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("user", "");
         String contraseña = sharedPreferences.getString("password", "");
+        DbManager db = new DbManager();
+        mongoCollection = db.obtenerUsuariosCollection();
         RealmResultTask<MongoCursor<UsuariosDB>> findTask = mongoCollection.find().iterator();
         findTask.getAsync(task -> {
             try {
@@ -95,12 +73,12 @@ public class InicioActivity extends AppCompatActivity {
                                 titleTextView.setText(u.getUsuario());
                                 subtitleTextView.setText(u.getEmail());
 
-                                if (u.getImagen().length>0){
+                                if (u.getImagen().length > 0) {
                                     byte[] imagenBytes = u.getImagen();
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
                                     imageView.setImageBitmap(bitmap);
 
-                                }else{
+                                } else {
                                     imageView.setImageDrawable(getDrawable(R.drawable.logo));
                                 }
                             }
@@ -122,6 +100,7 @@ public class InicioActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.clear();
                 editor.apply();
+                Toast.makeText(InicioActivity.this, "Sesión cerrada", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(InicioActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();

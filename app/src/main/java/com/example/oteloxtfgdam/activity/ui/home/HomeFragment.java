@@ -1,8 +1,6 @@
 package com.example.oteloxtfgdam.activity.ui.home;
 
 import static androidx.core.content.ContextCompat.getDrawable;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,42 +13,28 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.oteloxtfgdam.MyApp;
 import com.example.oteloxtfgdam.R;
 import com.example.oteloxtfgdam.databinding.FragmentHomeBinding;
-import com.example.oteloxtfgdam.db.UsuariosDB;
+import com.example.oteloxtfgdam.db.DbManager;
 import com.example.oteloxtfgdam.db.ZonasDB;
-
-import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
-import io.realm.mongodb.App;
-import io.realm.mongodb.AppConfiguration;
 import io.realm.mongodb.RealmResultTask;
-import io.realm.mongodb.User;
-import io.realm.mongodb.mongo.MongoClient;
 import io.realm.mongodb.mongo.MongoCollection;
-import io.realm.mongodb.mongo.MongoDatabase;
 import io.realm.mongodb.mongo.iterable.MongoCursor;
 
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    MongoClient mongoClient;
-    MongoDatabase mongoDatabase;
-    MongoCollection<Document> mongoCollection;
+    MongoCollection<ZonasDB> mongoCollection;
     LinearLayout linearLayout;
     int nivel = 0;
     boolean tituloTalaExiste;
@@ -78,45 +62,34 @@ public class HomeFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                App app = MyApp.getAppInstance();
-                User user = app.currentUser();
-
-                mongoClient = user.getMongoClient("mongodb-atlas");
-                mongoDatabase = mongoClient.getDatabase("bdoHelp");
-                mongoCollection = mongoDatabase.getCollection("Zonas");
-                CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY,
-                        fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-                MongoCollection<ZonasDB> mongoCollection =
-                        mongoDatabase.getCollection(
-                                "Zonas",
-                                ZonasDB.class).withCodecRegistry(pojoCodecRegistry);
-
+                DbManager db = new DbManager();
+                mongoCollection = db.obtenerZonasCollection();
                 RealmResultTask<MongoCursor<ZonasDB>> findTask = mongoCollection.find().iterator();
                 findTask.getAsync(task -> {
-                    try{
+                    try {
                         if (task.isSuccess()) {
                             MongoCursor<ZonasDB> results = task.get();
                             while (results.hasNext()) {
                                 ZonasDB z = results.next();
-                                zonas.add(new ZonasDB(z.getId(),z.getNombre(),z.getTipoZona(),z.getItem1(),z.getItem2(),z.getItem3(),z.getItem4(),z.getItem5()));
+                                zonas.add(new ZonasDB(z.getId(), z.getNombre(), z.getTipoZona(), z.getItem1(), z.getItem2(), z.getItem3(), z.getItem4(), z.getItem5()));
                             }
                         } else {
                             Log.e("EXAMPLE", "Error al encontrar el documento: ", task.getError());
                             progressDialog.dismiss();
-                            showErrorMensaje("Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
+                            showMensaje("Error", "Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                         }
 
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                for (ZonasDB zona: zonas) {
-                                    if (zona.getTipoZona().equals("Tala")){
+                                for (ZonasDB zona : zonas) {
+                                    if (zona.getTipoZona().equals("Tala")) {
                                         linearLayout = root.findViewById(R.id.linear_layout_home_tala);
                                     } else if (zona.getTipoZona().equals("Hierbas")) {
                                         linearLayout = root.findViewById(R.id.linear_layout_home_hierbas);
                                     } else if (zona.getTipoZona().equals("Sangre")) {
                                         linearLayout = root.findViewById(R.id.linear_layout_home_sangre);
-                                    }else{
+                                    } else {
                                         linearLayout = root.findViewById(R.id.linear_layout_home_carne);
                                     }
                                     View zonaView = inflater.inflate(R.layout.zona_view, linearLayout, false);
@@ -125,55 +98,55 @@ public class HomeFragment extends Fragment {
                                     ImageView item3Icon = zonaView.findViewById(R.id.item3_icon);
                                     ImageView item4Icon = zonaView.findViewById(R.id.item4_icon);
 
-                                    if (zona.getTipoZona().equals("Tala")){
-                                        if (!tituloTalaExiste){
+                                    if (zona.getTipoZona().equals("Tala")) {
+                                        if (!tituloTalaExiste) {
                                             TextView seccionTitulo = zonaView.findViewById(R.id.titulo_seccion);
                                             seccionTitulo.setVisibility(View.VISIBLE);
                                             seccionTitulo.setText(zona.getTipoZona());
                                             tituloTalaExiste = true;
                                         }
-                                        item1Icon.setImageDrawable(getDrawable(getContext(),R.drawable.tronco));
+                                        item1Icon.setImageDrawable(getDrawable(getContext(), R.drawable.tronco));
                                         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
-                                        nivel = sharedPreferences.getInt("tala", 0)/50;
+                                        nivel = sharedPreferences.getInt("tala", 0) / 50;
 
                                     } else if (zona.getTipoZona().equals("Hierbas")) {
-                                        if (!tituloHierbasExiste){
+                                        if (!tituloHierbasExiste) {
                                             TextView seccionTitulo = zonaView.findViewById(R.id.titulo_seccion);
                                             seccionTitulo.setVisibility(View.VISIBLE);
                                             seccionTitulo.setText(zona.getTipoZona());
                                             tituloHierbasExiste = true;
                                         }
-                                        item1Icon.setImageDrawable(getDrawable(getContext(),R.drawable.hierbas));
+                                        item1Icon.setImageDrawable(getDrawable(getContext(), R.drawable.hierbas));
                                         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
-                                        nivel = sharedPreferences.getInt("hierbas", 0)/50;
+                                        nivel = sharedPreferences.getInt("hierbas", 0) / 50;
 
                                     } else if (zona.getTipoZona().equals("Sangre")) {
-                                        if (!tituloSangreExiste){
+                                        if (!tituloSangreExiste) {
                                             TextView seccionTitulo = zonaView.findViewById(R.id.titulo_seccion);
                                             seccionTitulo.setVisibility(View.VISIBLE);
                                             seccionTitulo.setText(zona.getTipoZona());
                                             tituloSangreExiste = true;
                                         }
-                                        item1Icon.setImageDrawable(getDrawable(getContext(),R.drawable.sangres));
+                                        item1Icon.setImageDrawable(getDrawable(getContext(), R.drawable.sangres));
                                         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
-                                        nivel = sharedPreferences.getInt("sangre", 0)/50;
+                                        nivel = sharedPreferences.getInt("sangre", 0) / 50;
 
-                                    }else{
-                                        if (!tituloCarneExiste){
+                                    } else {
+                                        if (!tituloCarneExiste) {
                                             TextView seccionTitulo = zonaView.findViewById(R.id.titulo_seccion);
                                             seccionTitulo.setVisibility(View.VISIBLE);
                                             seccionTitulo.setText(zona.getTipoZona());
                                             tituloCarneExiste = true;
                                         }
-                                        item1Icon.setImageDrawable(getDrawable(getContext(),R.drawable.carne));
+                                        item1Icon.setImageDrawable(getDrawable(getContext(), R.drawable.carne));
                                         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
-                                        nivel = sharedPreferences.getInt("carne", 0)/50;
+                                        nivel = sharedPreferences.getInt("carne", 0) / 50;
 
                                     }
 
-                                    item2Icon.setImageDrawable(getDrawable(getContext(),R.drawable.polvo_espiritu));
-                                    item3Icon.setImageDrawable(getDrawable(getContext(),R.drawable.polvo_hadas));
-                                    item4Icon.setImageDrawable(getDrawable(getContext(),R.drawable.caphranita));
+                                    item2Icon.setImageDrawable(getDrawable(getContext(), R.drawable.polvo_espiritu));
+                                    item3Icon.setImageDrawable(getDrawable(getContext(), R.drawable.polvo_hadas));
+                                    item4Icon.setImageDrawable(getDrawable(getContext(), R.drawable.caphranita));
 
                                     TextView zonaNombre = zonaView.findViewById(R.id.zona_nombre);
                                     TextView item1Nombre = zonaView.findViewById(R.id.item1_nombre);
@@ -181,34 +154,33 @@ public class HomeFragment extends Fragment {
                                     TextView item3Nombre = zonaView.findViewById(R.id.item3_nombre);
                                     TextView item4Nombre = zonaView.findViewById(R.id.item4_nombre);
                                     zonaNombre.setText(zona.getNombre());
-                                    item1Nombre.setText(String.valueOf(zona.getItem1()*nivel));
-                                    item2Nombre.setText(String.valueOf(zona.getItem2()*nivel));
-                                    item3Nombre.setText(String.valueOf(zona.getItem3()*nivel));
-                                    item4Nombre.setText(String.valueOf(zona.getItem4()*nivel));
+                                    item1Nombre.setText(String.valueOf(zona.getItem1() * nivel));
+                                    item2Nombre.setText(String.valueOf(zona.getItem2() * nivel));
+                                    item3Nombre.setText(String.valueOf(zona.getItem3() * nivel));
+                                    item4Nombre.setText(String.valueOf(zona.getItem4() * nivel));
                                     linearLayout.addView(zonaView);
                                 }
                             }
                         });
 
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         progressDialog.dismiss();
-                        showErrorMensaje("Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
+                        showMensaje("Error", "Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                         e.printStackTrace();
                     }
                     progressDialog.dismiss();
                 });
-
             }
         });
         return root;
     }
 
-    private void showErrorMensaje(String mensaje) {
+    private void showMensaje(String titulo, String mensaje) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Error")
+                builder.setTitle(titulo)
                         .setMessage(mensaje)
                         .setPositiveButton("Aceptar", null)
                         .show();

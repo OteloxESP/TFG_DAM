@@ -1,8 +1,6 @@
 package com.example.oteloxtfgdam.activity.ui.mercado;
 
 import static androidx.core.content.ContextCompat.getDrawable;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -19,16 +17,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.oteloxtfgdam.MyApp;
 import com.example.oteloxtfgdam.R;
 import com.example.oteloxtfgdam.databinding.FragmentMercadoBinding;
+import com.example.oteloxtfgdam.db.DbManager;
 import com.example.oteloxtfgdam.db.Item;
 import com.example.oteloxtfgdam.db.ItemsDB;
 import com.squareup.picasso.Picasso;
 
 import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,13 +40,8 @@ import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.realm.mongodb.App;
-import io.realm.mongodb.AppConfiguration;
 import io.realm.mongodb.RealmResultTask;
-import io.realm.mongodb.User;
-import io.realm.mongodb.mongo.MongoClient;
 import io.realm.mongodb.mongo.MongoCollection;
-import io.realm.mongodb.mongo.MongoDatabase;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -60,9 +51,7 @@ import okhttp3.Response;
 public class MercadoFragment extends Fragment {
 
     private FragmentMercadoBinding binding;
-    MongoClient mongoClient;
-    MongoDatabase mongoDatabase;
-    MongoCollection<Document> mongoCollection;
+    MongoCollection<ItemsDB> mongoCollection;
     List<Item> items = new ArrayList<>();
     ProgressDialog progressDialog;
 
@@ -89,7 +78,7 @@ public class MercadoFragment extends Fragment {
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
                 progressDialog.dismiss();
-                showMensaje("Error","Error de red. Por favor, comprueba tu conexión a internet.");
+                showMensaje("Error", "Error de red. Por favor, comprueba tu conexión a internet.");
             }
 
             @Override
@@ -109,12 +98,12 @@ public class MercadoFragment extends Fragment {
                             procesarJSON(jsonObject);
                         } else {
                             progressDialog.dismiss();
-                            showMensaje("Error","La respuesta del servidor no es válida.");
+                            showMensaje("Error", "La respuesta del servidor no es válida.");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                         progressDialog.dismiss();
-                        showMensaje("Error","Error al procesar la respuesta del servidor.");
+                        showMensaje("Error", "Error al procesar la respuesta del servidor.");
                     }
 
                     LinearLayout linearLayout = root.findViewById(R.id.linear_layout);
@@ -171,11 +160,11 @@ public class MercadoFragment extends Fragment {
                     progressDialog.dismiss();
                 } else {
                     progressDialog.dismiss();
-                    Log.e("Error llamada",response.body()+"");
-                    if (response.code()==515){
-                        showMensaje("Atención","No hay items en la lista de espera en estos momentos");
-                    }else{
-                        showMensaje("Error","Error al realizar la solicitud. Por favor, inténtalo de nuevo más tarde.");
+                    Log.e("Error llamada", response.body() + "");
+                    if (response.code() == 515) {
+                        showMensaje("Atención", "No hay items en la lista de espera en estos momentos");
+                    } else {
+                        showMensaje("Error", "Error al realizar la solicitud. Por favor, inténtalo de nuevo más tarde.");
                     }
                 }
             }
@@ -183,8 +172,8 @@ public class MercadoFragment extends Fragment {
         return root;
     }
 
-    public void procesarJSON(JSONObject jsonObject){
-        try{
+    public void procesarJSON(JSONObject jsonObject) {
+        try {
             String id = String.valueOf(jsonObject.getInt("id"));
             String nombre = jsonObject.getString("name");
             long precio = jsonObject.getLong("price");
@@ -196,18 +185,8 @@ public class MercadoFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    App app = MyApp.getAppInstance();
-                    User user = app.currentUser();
-
-                    mongoClient = user.getMongoClient("mongodb-atlas");
-                    mongoDatabase = mongoClient.getDatabase("bdoHelp");
-                    mongoCollection = mongoDatabase.getCollection("Items");
-                    CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY,
-                            fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-                    MongoCollection<ItemsDB> mongoCollection =
-                            mongoDatabase.getCollection(
-                                    "Items",
-                                    ItemsDB.class).withCodecRegistry(pojoCodecRegistry);
+                    DbManager db = new DbManager();
+                    mongoCollection = db.obtenerItemsCollection();
 
                     Document queryFilter = null;
                     queryFilter = new Document("itemId", id);
@@ -226,7 +205,7 @@ public class MercadoFragment extends Fragment {
                         } else {
                             Log.e("EXAMPLE", "Error al encontrar el documento: ", task.getError());
                             progressDialog.dismiss();
-                            showMensaje("Error","Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
+                            showMensaje("Error", "Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                         }
                         latch.countDown();
                     });
@@ -241,10 +220,10 @@ public class MercadoFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
             progressDialog.dismiss();
-            showMensaje("Error","Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
+            showMensaje("Error", "Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
         }
-
     }
+
     private void showMensaje(String titulo, String mensaje) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -257,6 +236,7 @@ public class MercadoFragment extends Fragment {
             }
         });
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

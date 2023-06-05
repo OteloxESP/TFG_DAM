@@ -1,8 +1,6 @@
 package com.example.oteloxtfgdam.activity.ui.perfil;
 
 import static androidx.core.content.ContextCompat.getDrawable;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -27,16 +25,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import com.example.oteloxtfgdam.MyApp;
 import com.example.oteloxtfgdam.R;
 import com.example.oteloxtfgdam.activity.InicioActivity;
 import com.example.oteloxtfgdam.databinding.FragmentPerfilBinding;
+import com.example.oteloxtfgdam.db.DbManager;
 import com.example.oteloxtfgdam.db.UsuariosDB;
-import com.google.android.material.navigation.NavigationView;
 
 import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.ByteArrayOutputStream;
@@ -44,13 +39,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import io.realm.mongodb.App;
-import io.realm.mongodb.AppConfiguration;
 import io.realm.mongodb.RealmResultTask;
-import io.realm.mongodb.User;
-import io.realm.mongodb.mongo.MongoClient;
 import io.realm.mongodb.mongo.MongoCollection;
-import io.realm.mongodb.mongo.MongoDatabase;
 import io.realm.mongodb.mongo.iterable.MongoCursor;
 import io.realm.mongodb.mongo.result.UpdateResult;
 
@@ -61,13 +51,12 @@ public class PerfilFragment extends Fragment {
     private UsuariosDB usuario;
     private Uri imagenActual;
     private Boolean nuevaFoto = false;
-    MongoClient mongoClient;
-    MongoDatabase mongoDatabase;
-    MongoCollection<Document> mongoCollection;
+    ProgressDialog progressDialog;
+    MongoCollection<UsuariosDB> mongoCollection;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Cargando perfil...");
         progressDialog.setCancelable(false);
         progressDialog.show();
@@ -79,17 +68,8 @@ public class PerfilFragment extends Fragment {
         EditText carneEditText = binding.carneEditText;
         Button guardarButton = binding.guardarButton;
 
-        App app = MyApp.getAppInstance();
-        User user = app.currentUser();
-        mongoClient = user.getMongoClient("mongodb-atlas");
-        mongoDatabase = mongoClient.getDatabase("bdoHelp");
-        mongoCollection = mongoDatabase.getCollection("Usuarios");
-        CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY,
-                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-        MongoCollection<UsuariosDB> mongoCollection =
-                mongoDatabase.getCollection(
-                        "Usuarios",
-                        UsuariosDB.class).withCodecRegistry(pojoCodecRegistry);
+        DbManager db = new DbManager();
+        mongoCollection = db.obtenerUsuariosCollection();
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("user", "");
         String contraseña = sharedPreferences.getString("password", "");
@@ -210,7 +190,7 @@ public class PerfilFragment extends Fragment {
                                     editor.putInt("sangre", usuario.getMaestriaSangre());
                                     editor.apply();
                                     Toast.makeText(activity, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
-                                    
+
                                 } else if (count == 0) {
                                     Log.v("EXAMPLE", "No se encontró el documento para actualizar");
                                 } else {
