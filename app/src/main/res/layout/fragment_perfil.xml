@@ -39,11 +39,12 @@
                 android:focusable="false" />
         </FrameLayout>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/recoleccion_section_header"
+            style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="26dp"
             android:text="@string/recoleccion_section_header"
             android:textAlignment="center"
             android:textColor="@color/white"
@@ -54,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
             android:hint="@string/tala_input_hint"
             android:textColor="@color/white">
@@ -65,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:digits="0123456789"
-                android:maxLength="5"
+                android:maxLength="4"
                 android:imeOptions="actionNext"
                 android:singleLine="true" />
 
@@ -76,7 +77,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
             android:hint="@string/sangre_input_hint"
             android:textColor="@color/white">
@@ -87,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:digits="0123456789"
-                android:maxLength="5"
+                android:maxLength="4"
                 android:imeOptions="actionNext"
                 android:singleLine="true" />
 
@@ -98,7 +99,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
             android:hint="@string/hoz_input_hint">
 
@@ -108,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:digits="0123456789"
-                android:maxLength="5"
+                android:maxLength="4"
                 android:imeOptions="actionNext"
                 android:singleLine="true"
                 android:textColor="@color/white"/>
@@ -120,7 +121,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:hint="@string/carne_input_hint">
@@ -131,7 +132,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:digits="0123456789"
-                android:maxLength="5"
+                android:maxLength="4"
                 android:imeOptions="actionNext"
                 android:clickable="true"
                 android:focusableInTouchMode="true"
@@ -140,14 +141,18 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/guardar_button"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
-            android:text="Guardar" />
+            android:text="@string/guardar"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:backgroundTint="@color/botonesFondo"/>
 
     </LinearLayout>
 </ScrollView>

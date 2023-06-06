@@ -32,6 +32,9 @@
     <string name="hoz_input_hint">Hierbas</string>
     <string name="sangre_input_hint">Sangre</string>
     <string name="tala_input_hint">Tala</string>
-    <string name="recoleccion_section_header">Maestria en recolección</string>
+    <string name="recoleccion_section_header">Maestría en recolección</string>
     <string name="menu_salir">Salir</string>
+    <string name="campo_vacio">No puedes dejar el campo vacío</string>
+    <string name="maestria_fuera_rango">El valor tiene que ser entre 0 y 2000</string>
+    <string name="guardar">Guardar</string>
 </resources>

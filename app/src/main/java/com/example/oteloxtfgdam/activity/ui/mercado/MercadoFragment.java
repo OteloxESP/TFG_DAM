@@ -15,7 +15,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.oteloxtfgdam.R;
 import com.example.oteloxtfgdam.databinding.FragmentMercadoBinding;
@@ -55,14 +54,9 @@ public class MercadoFragment extends Fragment {
     List<Item> items = new ArrayList<>();
     ProgressDialog progressDialog;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        MercadoViewModel mercadoViewModel =
-                new ViewModelProvider(this).get(MercadoViewModel.class);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMercadoBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
 
         OkHttpClient client = new OkHttpClient();
         String url = "https://api.arsha.io/v2/eu/GetWorldMarketWaitList?lang=es";

@@ -17,7 +17,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.oteloxtfgdam.R;
 import com.example.oteloxtfgdam.databinding.FragmentHomeBinding;
@@ -32,7 +31,6 @@ import io.realm.mongodb.mongo.MongoCollection;
 import io.realm.mongodb.mongo.iterable.MongoCursor;
 
 public class HomeFragment extends Fragment {
-
     private FragmentHomeBinding binding;
     MongoCollection<ZonasDB> mongoCollection;
     LinearLayout linearLayout;
@@ -42,11 +40,7 @@ public class HomeFragment extends Fragment {
     boolean tituloSangreExiste;
     boolean tituloHierbasExiste;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         List<ZonasDB> zonas = new ArrayList<>();

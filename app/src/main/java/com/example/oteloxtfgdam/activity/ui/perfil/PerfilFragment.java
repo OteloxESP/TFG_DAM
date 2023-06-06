@@ -53,6 +53,8 @@ public class PerfilFragment extends Fragment {
     private Boolean nuevaFoto = false;
     ProgressDialog progressDialog;
     MongoCollection<UsuariosDB> mongoCollection;
+    EditText talaEditText, sangreEditText, hozEditText, carneEditText;
+    int valorTala, valorCarne, valorHierba, valorSangre;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,10 +64,10 @@ public class PerfilFragment extends Fragment {
         progressDialog.show();
         binding = FragmentPerfilBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        EditText talaEditText = binding.talaEditText;
-        EditText sangreEditText = binding.sangreEditText;
-        EditText hozEditText = binding.hozEditText;
-        EditText carneEditText = binding.carneEditText;
+        talaEditText = binding.talaEditText;
+        sangreEditText = binding.sangreEditText;
+        hozEditText = binding.hozEditText;
+        carneEditText = binding.carneEditText;
         Button guardarButton = binding.guardarButton;
 
         DbManager db = new DbManager();
@@ -89,9 +91,13 @@ public class PerfilFragment extends Fragment {
                                 String hierbas = String.valueOf(usuario.getMaestriaHierbas());
                                 String carne = String.valueOf(usuario.getMaestriaCarne());
                                 talaEditText.setText(tala);
+                                talaEditText.setError(null);
                                 sangreEditText.setText(sangre);
+                                sangreEditText.setError(null);
                                 hozEditText.setText(hierbas);
+                                hozEditText.setError(null);
                                 carneEditText.setText(carne);
+                                carneEditText.setError(null);
 
                                 if (usuario.getImagen() != null && usuario.getImagen().length > 0) {
                                     byte[] imagenBytes = usuario.getImagen();
@@ -105,6 +111,8 @@ public class PerfilFragment extends Fragment {
                     }
                     progressDialog.dismiss();
                 } else {
+                    progressDialog.dismiss();
+                    showErrorMensaje("Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                     Log.e("EXAMPLE", "failed to find documents with: ", task.getError());
                 }
             } catch (Exception e) {
@@ -124,95 +132,96 @@ public class PerfilFragment extends Fragment {
         guardarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (validarCampos()) {
+                    if (usuario != null) {
+                        try {
+                            if (nuevaFoto) {
+                                InputStream inputStream = requireContext().getContentResolver().openInputStream(imagenActual);
+                                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                                // Leer los datos de la imagen y escribirlos en el ByteArrayOutputStream
+                                byte[] buffer = new byte[4096];
+                                int bytesRead;
+                                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                    outputStream.write(buffer, 0, bytesRead);
+                                }
 
-                if (usuario != null) {
-                    try {
-                        if (nuevaFoto) {
-                            InputStream inputStream = requireContext().getContentResolver().openInputStream(imagenActual);
-                            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                            // Leer los datos de la imagen y escribirlos en el ByteArrayOutputStream
-                            byte[] buffer = new byte[4096];
-                            int bytesRead;
-                            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                outputStream.write(buffer, 0, bytesRead);
+                                // Obtener el array de bytes resultante de la conversión
+                                byte[] imagenBytes = outputStream.toByteArray();
+
+                                // Asignar los bytes de la imagen al campo blob
+                                usuario.setImagen(imagenBytes);
+                                inputStream.close();
+                                outputStream.close();
                             }
 
-                            // Obtener el array de bytes resultante de la conversión
-                            byte[] imagenBytes = outputStream.toByteArray();
+                            usuario.setMaestriaTala(Integer.parseInt(talaEditText.getText().toString()));
+                            usuario.setMaestriaSangre(Integer.parseInt(sangreEditText.getText().toString()));
+                            usuario.setMaestriaHierbas(Integer.parseInt(hozEditText.getText().toString()));
+                            usuario.setMaestriaCarne(Integer.parseInt(carneEditText.getText().toString()));
 
-                            // Asignar los bytes de la imagen al campo blob
-                            usuario.setImagen(imagenBytes);
-                            inputStream.close();
-                            outputStream.close();
-                        }
-
-                        usuario.setMaestriaTala(Integer.parseInt(talaEditText.getText().toString()));
-                        usuario.setMaestriaSangre(Integer.parseInt(sangreEditText.getText().toString()));
-                        usuario.setMaestriaHierbas(Integer.parseInt(hozEditText.getText().toString()));
-                        usuario.setMaestriaCarne(Integer.parseInt(carneEditText.getText().toString()));
-
-                        Document queryFilter = new Document("_id", usuario.getId());
-                        Document updateDocument = new Document("$set", new Document()
-                                .append("usuario", usuario.getUsuario())
-                                .append("maestriaTala", usuario.getMaestriaTala())
-                                .append("maestriaSangre", usuario.getMaestriaSangre())
-                                .append("maestriaHierbas", usuario.getMaestriaHierbas())
-                                .append("maestriaCarne", usuario.getMaestriaCarne()));
-                        if (nuevaFoto) {
-                            updateDocument = new Document("$set", new Document()
-                                    .append("imagen", usuario.getImagen())
+                            Document queryFilter = new Document("_id", usuario.getId());
+                            Document updateDocument = new Document("$set", new Document()
                                     .append("usuario", usuario.getUsuario())
                                     .append("maestriaTala", usuario.getMaestriaTala())
                                     .append("maestriaSangre", usuario.getMaestriaSangre())
                                     .append("maestriaHierbas", usuario.getMaestriaHierbas())
                                     .append("maestriaCarne", usuario.getMaestriaCarne()));
-                        }
-                        InicioActivity activity = (InicioActivity) getActivity();
-                        if (usuario.getImagen() != null && usuario.getImagen().length > 0) {
-                            byte[] imagenBytes = usuario.getImagen();
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
-                            activity.imageView.setImageBitmap(bitmap);
-                        } else {
-                            activity.imageView.setImageDrawable(getDrawable(getContext(), R.drawable.logo));
-                        }
-
-                        mongoCollection.updateOne(queryFilter, updateDocument).getAsync(task2 -> {
-                            if (task2.isSuccess()) {
-                                UpdateResult result = task2.get();
-                                long count = result.getModifiedCount();
-                                if (count == 1) {
-                                    Log.v("EXAMPLE", "Documento actualizado correctamente");
-                                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putInt("tala", usuario.getMaestriaTala());
-                                    editor.putInt("hierbas", usuario.getMaestriaHierbas());
-                                    editor.putInt("carne", usuario.getMaestriaCarne());
-                                    editor.putInt("sangre", usuario.getMaestriaSangre());
-                                    editor.apply();
-                                    Toast.makeText(activity, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
-
-                                } else if (count == 0) {
-                                    Log.v("EXAMPLE", "No se encontró el documento para actualizar");
-                                } else {
-                                    Log.v("EXAMPLE", "Se encontraron múltiples documentos para actualizar. Actualizados: " + count);
-                                }
-                            } else {
-                                Log.e("EXAMPLE", "Error al actualizar el documento: ", task2.getError());
-                                showErrorMensaje("Error al actualizar el perfil. Por favor, inténtalo de nuevo más tarde.");
+                            if (nuevaFoto) {
+                                updateDocument = new Document("$set", new Document()
+                                        .append("imagen", usuario.getImagen())
+                                        .append("usuario", usuario.getUsuario())
+                                        .append("maestriaTala", usuario.getMaestriaTala())
+                                        .append("maestriaSangre", usuario.getMaestriaSangre())
+                                        .append("maestriaHierbas", usuario.getMaestriaHierbas())
+                                        .append("maestriaCarne", usuario.getMaestriaCarne()));
                             }
-                        });
-                    } catch (FileNotFoundException e) {
-                        showErrorMensaje("Error al acceder a la imagen seleccionada. Por favor, selecciona otra imagen.");
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        showErrorMensaje("Error al procesar la imagen seleccionada. Por favor, selecciona otra imagen.");
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        showErrorMensaje("Error al actualizar el perfil. Por favor, inténtalo de nuevo más tarde.");
-                        e.printStackTrace();
+                            InicioActivity activity = (InicioActivity) getActivity();
+                            if (usuario.getImagen() != null && usuario.getImagen().length > 0) {
+                                byte[] imagenBytes = usuario.getImagen();
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
+                                activity.imageView.setImageBitmap(bitmap);
+                            } else {
+                                activity.imageView.setImageDrawable(getDrawable(getContext(), R.drawable.logo));
+                            }
+
+                            mongoCollection.updateOne(queryFilter, updateDocument).getAsync(task2 -> {
+                                if (task2.isSuccess()) {
+                                    UpdateResult result = task2.get();
+                                    long count = result.getModifiedCount();
+                                    if (count == 1) {
+                                        Log.v("EXAMPLE", "Documento actualizado correctamente");
+                                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                        editor.putInt("tala", usuario.getMaestriaTala());
+                                        editor.putInt("hierbas", usuario.getMaestriaHierbas());
+                                        editor.putInt("carne", usuario.getMaestriaCarne());
+                                        editor.putInt("sangre", usuario.getMaestriaSangre());
+                                        editor.apply();
+                                        Toast.makeText(activity, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
+
+                                    } else if (count == 0) {
+                                        Log.v("EXAMPLE", "No se encontró el documento para actualizar");
+                                    } else {
+                                        Log.v("EXAMPLE", "Se encontraron múltiples documentos para actualizar. Actualizados: " + count);
+                                    }
+                                } else {
+                                    Log.e("EXAMPLE", "Error al actualizar el documento: ", task2.getError());
+                                    showErrorMensaje("Error al actualizar el perfil. Por favor, inténtalo de nuevo más tarde.");
+                                }
+                            });
+                        } catch (FileNotFoundException e) {
+                            showErrorMensaje("Error al acceder a la imagen seleccionada. Por favor, selecciona otra imagen.");
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            showErrorMensaje("Error al procesar la imagen seleccionada. Por favor, selecciona otra imagen.");
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            showErrorMensaje("Error al actualizar el perfil. Por favor, inténtalo de nuevo más tarde.");
+                            e.printStackTrace();
+                        }
+                    } else {
+                        showErrorMensaje("No se pudo encontrar el usuario. Por favor, vuelve a iniciar sesión.");
                     }
-                } else {
-                    showErrorMensaje("No se pudo encontrar el usuario. Por favor, vuelve a iniciar sesión.");
                 }
             }
         });
@@ -234,6 +243,67 @@ public class PerfilFragment extends Fragment {
             ImageView imagenPreview = binding.profileImage;
             imagenPreview.setImageURI(imagenActual);
         }
+    }
+
+    public Boolean validarCampos() {
+        Boolean v = true;
+        if (talaEditText.getText().toString().isEmpty()) {
+            talaEditText.setError(getString(R.string.campo_vacio));
+            v = false;
+
+        } else {
+            valorTala = Integer.parseInt(talaEditText.getText().toString());
+            if (valorTala < 0 || valorTala > 2000) {
+                talaEditText.setError((getString(R.string.maestria_fuera_rango)));
+                v = false;
+            } else {
+                talaEditText.setError(null);
+            }
+        }
+
+        if (carneEditText.getText().toString().isEmpty()) {
+            carneEditText.setError(getString(R.string.campo_vacio));
+            v = false;
+
+        } else {
+            valorCarne = Integer.parseInt(carneEditText.getText().toString());
+            if (valorCarne < 0 || valorCarne > 2000) {
+                carneEditText.setError((getString(R.string.maestria_fuera_rango)));
+                v = false;
+            } else {
+                carneEditText.setError(null);
+            }
+        }
+
+        if (hozEditText.getText().toString().isEmpty()) {
+            hozEditText.setError(getString(R.string.campo_vacio));
+            v = false;
+
+        } else {
+            valorHierba = Integer.parseInt(hozEditText.getText().toString());
+            if (valorHierba < 0 || valorHierba > 2000) {
+                hozEditText.setError((getString(R.string.maestria_fuera_rango)));
+                v = false;
+            } else {
+                hozEditText.setError(null);
+            }
+        }
+
+        if (sangreEditText.getText().toString().isEmpty()) {
+            sangreEditText.setError(getString(R.string.campo_vacio));
+            v = false;
+
+        } else {
+            valorSangre = Integer.parseInt(sangreEditText.getText().toString());
+            if (valorSangre < 0 || valorSangre > 2000) {
+                sangreEditText.setError((getString(R.string.maestria_fuera_rango)));
+                v = false;
+            } else {
+                sangreEditText.setError(null);
+            }
+        }
+
+        return v;
     }
 
     private void showErrorMensaje(String mensaje) {
