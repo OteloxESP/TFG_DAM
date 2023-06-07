@@ -113,16 +113,16 @@ public class RegisterActivity extends AppCompatActivity {
                 RealmResultTask<MongoCursor<UsuariosDB>> findTask = mongoCollection.find().iterator();
                 findTask.getAsync(task -> {
                     try {
-                        Boolean v = false;
-                        Boolean v2 = false;
+                        Boolean v = true;
+                        Boolean v2 = true;
                         if (task.isSuccess()) {
                             MongoCursor<UsuariosDB> results = task.get();
                             while (results.hasNext()) {
                                 UsuariosDB u = results.next();
                                 if (usuario.equals(u.getUsuario())){
-                                    v = true;
+                                    v = false;
                                     if (email.equals(u.getEmail())){
-                                        v2 = true;
+                                        v2 = false;
                                     }
                                 }
                             }
@@ -132,8 +132,9 @@ public class RegisterActivity extends AppCompatActivity {
                             showMensaje("Error","Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                         }
 
-                        if (!v && !v2)
-                        {
+                        if (v && v2) {
+                            mUsernameEditText.setError(null);
+                            mEmailEditText.setError(null);
                             String salt = BCrypt.gensalt();
                             String contraseñaEncriptada = BCrypt.hashpw(contraseña, salt);
                             UsuariosDB nuevoUser = new UsuariosDB(
@@ -157,6 +158,14 @@ public class RegisterActivity extends AppCompatActivity {
                                     showMensaje("Error","Error al procesar los datos. Por favor, inténtalo de nuevo más tarde.");
                                 }
                             });
+                        }else{
+                            progressDialog.dismiss();
+                            if (!v){
+                                mUsernameTextInputLayout.setError(getString(R.string.usuario_ya_existe));
+                            }
+                            if (!v2){
+                                mEmailTextInputLayout.setError(getString(R.string.email_ya_existe));
+                            }
                         }
 
                     } catch (Exception e) {

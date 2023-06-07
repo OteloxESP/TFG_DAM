@@ -37,4 +37,6 @@
     <string name="campo_vacio">No puedes dejar el campo vacío</string>
     <string name="maestria_fuera_rango">El valor tiene que ser entre 0 y 2000</string>
     <string name="guardar">Guardar</string>
+    <string name="usuario_ya_existe">El usuario ya existe</string>
+    <string name="email_ya_existe">El email ya existe</string>
 </resources>

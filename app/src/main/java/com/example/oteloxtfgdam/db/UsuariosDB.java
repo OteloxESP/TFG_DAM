@@ -12,6 +12,7 @@ public class UsuariosDB {
     private int maestriaHierbas;
     private int maestriaCarne;
     private byte[] imagen;
+    private int administrador;
 
     public UsuariosDB() {
 
@@ -33,6 +34,7 @@ public class UsuariosDB {
         this.maestriaHierbas = 1000;
         this.maestriaCarne = 1000;
         this.imagen = new byte[0];
+        this.administrador = 0;
     }
 
     public UsuariosDB(ObjectId id, String usuario, String contraseña, String email, int tala, int sangre, int hierbas, int carne, byte[] imagen){
@@ -117,5 +119,13 @@ public class UsuariosDB {
 
     public void setImagen(byte[] imagen) {
         this.imagen = imagen;
+    }
+
+    public int getAdministrador() {
+        return administrador;
+    }
+
+    public void setAdministrador(int administrador) {
+        this.administrador = administrador;
     }
 }

@@ -30,6 +30,7 @@ import com.example.oteloxtfgdam.activity.InicioActivity;
 import com.example.oteloxtfgdam.databinding.FragmentPerfilBinding;
 import com.example.oteloxtfgdam.db.DbManager;
 import com.example.oteloxtfgdam.db.UsuariosDB;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.bson.Document;
 import org.mindrot.jbcrypt.BCrypt;
@@ -54,6 +55,7 @@ public class PerfilFragment extends Fragment {
     ProgressDialog progressDialog;
     MongoCollection<UsuariosDB> mongoCollection;
     EditText talaEditText, sangreEditText, hozEditText, carneEditText;
+    TextInputLayout talaEditTextInputLayout, sangreEditTextInputLayout, hozEditTextInputLayout, carneEditTextInputLayout;
     int valorTala, valorCarne, valorHierba, valorSangre;
 
     @Override
@@ -68,6 +70,10 @@ public class PerfilFragment extends Fragment {
         sangreEditText = binding.sangreEditText;
         hozEditText = binding.hozEditText;
         carneEditText = binding.carneEditText;
+        talaEditTextInputLayout = binding.talaInputLayout;
+        sangreEditTextInputLayout = binding.sangreInputLayout;
+        hozEditTextInputLayout = binding.hozInputLayout;
+        carneEditTextInputLayout = binding.carneInputLayout;
         Button guardarButton = binding.guardarButton;
 
         DbManager db = new DbManager();
@@ -91,13 +97,13 @@ public class PerfilFragment extends Fragment {
                                 String hierbas = String.valueOf(usuario.getMaestriaHierbas());
                                 String carne = String.valueOf(usuario.getMaestriaCarne());
                                 talaEditText.setText(tala);
-                                talaEditText.setError(null);
+                                talaEditTextInputLayout.setError(null);
                                 sangreEditText.setText(sangre);
-                                sangreEditText.setError(null);
+                                sangreEditTextInputLayout.setError(null);
                                 hozEditText.setText(hierbas);
-                                hozEditText.setError(null);
+                                hozEditTextInputLayout.setError(null);
                                 carneEditText.setText(carne);
-                                carneEditText.setError(null);
+                                carneEditTextInputLayout.setError(null);
 
                                 if (usuario.getImagen() != null && usuario.getImagen().length > 0) {
                                     byte[] imagenBytes = usuario.getImagen();
@@ -248,58 +254,58 @@ public class PerfilFragment extends Fragment {
     public Boolean validarCampos() {
         Boolean v = true;
         if (talaEditText.getText().toString().isEmpty()) {
-            talaEditText.setError(getString(R.string.campo_vacio));
+            talaEditTextInputLayout.setError(getString(R.string.campo_vacio));
             v = false;
 
         } else {
             valorTala = Integer.parseInt(talaEditText.getText().toString());
             if (valorTala < 0 || valorTala > 2000) {
-                talaEditText.setError((getString(R.string.maestria_fuera_rango)));
+                talaEditTextInputLayout.setError((getString(R.string.maestria_fuera_rango)));
                 v = false;
             } else {
-                talaEditText.setError(null);
+                talaEditTextInputLayout.setError(null);
             }
         }
 
         if (carneEditText.getText().toString().isEmpty()) {
-            carneEditText.setError(getString(R.string.campo_vacio));
+            carneEditTextInputLayout.setError(getString(R.string.campo_vacio));
             v = false;
 
         } else {
             valorCarne = Integer.parseInt(carneEditText.getText().toString());
             if (valorCarne < 0 || valorCarne > 2000) {
-                carneEditText.setError((getString(R.string.maestria_fuera_rango)));
+                carneEditTextInputLayout.setError((getString(R.string.maestria_fuera_rango)));
                 v = false;
             } else {
-                carneEditText.setError(null);
+                carneEditTextInputLayout.setError(null);
             }
         }
 
         if (hozEditText.getText().toString().isEmpty()) {
-            hozEditText.setError(getString(R.string.campo_vacio));
+            hozEditTextInputLayout.setError(getString(R.string.campo_vacio));
             v = false;
 
         } else {
             valorHierba = Integer.parseInt(hozEditText.getText().toString());
             if (valorHierba < 0 || valorHierba > 2000) {
-                hozEditText.setError((getString(R.string.maestria_fuera_rango)));
+                hozEditTextInputLayout.setError((getString(R.string.maestria_fuera_rango)));
                 v = false;
             } else {
-                hozEditText.setError(null);
+                hozEditTextInputLayout.setError(null);
             }
         }
 
         if (sangreEditText.getText().toString().isEmpty()) {
-            sangreEditText.setError(getString(R.string.campo_vacio));
+            sangreEditTextInputLayout.setError(getString(R.string.campo_vacio));
             v = false;
 
         } else {
             valorSangre = Integer.parseInt(sangreEditText.getText().toString());
             if (valorSangre < 0 || valorSangre > 2000) {
-                sangreEditText.setError((getString(R.string.maestria_fuera_rango)));
+                sangreEditTextInputLayout.setError((getString(R.string.maestria_fuera_rango)));
                 v = false;
             } else {
-                sangreEditText.setError(null);
+                sangreEditTextInputLayout.setError(null);
             }
         }
 

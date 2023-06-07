@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
                         } else if (!v || !v2) {
                             mUsernameTextInputLayout.setError(getString(R.string.username_incorrect));
                             mPasswordTextInputLayout.setError(getString(R.string.password_incorrect));
-
+                            progressDialog.dismiss();
                         }
 
                     } catch (Exception e) {
