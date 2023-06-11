@@ -121,9 +121,9 @@ public class RegisterActivity extends AppCompatActivity {
                                 UsuariosDB u = results.next();
                                 if (usuario.equals(u.getUsuario())){
                                     v = false;
-                                    if (email.equals(u.getEmail())){
-                                        v2 = false;
-                                    }
+                                }
+                                if (email.equals(u.getEmail())){
+                                    v2 = false;
                                 }
                             }
                         } else {
