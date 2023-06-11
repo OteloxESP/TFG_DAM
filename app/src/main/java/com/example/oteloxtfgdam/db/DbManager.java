@@ -25,7 +25,10 @@ public class DbManager {
     App app;
     public DbManager(){
         app = MyApp.getAppInstance();
-        if (app.currentUser() == null) {
+    }
+
+    public MongoCollection obtenerUsuariosCollection(){
+        if (app.currentUser() == null){
             app.loginAsync(Credentials.anonymous(), new App.Callback<User>() {
                 @Override
                 public void onResult(App.Result<User> result) {
@@ -35,9 +38,6 @@ public class DbManager {
         }else{
             user = app.currentUser();
         }
-    }
-
-    public MongoCollection obtenerUsuariosCollection(){
         mongoClient = user.getMongoClient("mongodb-atlas");
         mongoDatabase = mongoClient.getDatabase("bdoHelp");
         mongoCollection = mongoDatabase.getCollection("Usuarios");
@@ -51,6 +51,16 @@ public class DbManager {
     }
 
     public MongoCollection obtenerZonasCollection(){
+        if (app.currentUser() == null) {
+            app.loginAsync(Credentials.anonymous(), new App.Callback<User>() {
+                @Override
+                public void onResult(App.Result<User> result) {
+                    user = app.currentUser();
+                }
+            });
+        }else{
+            user = app.currentUser();
+        }
         mongoClient = user.getMongoClient("mongodb-atlas");
         mongoDatabase = mongoClient.getDatabase("bdoHelp");
         mongoCollection = mongoDatabase.getCollection("Zonas");
@@ -64,6 +74,16 @@ public class DbManager {
     }
 
     public MongoCollection obtenerItemsCollection(){
+        if (app.currentUser() == null) {
+            app.loginAsync(Credentials.anonymous(), new App.Callback<User>() {
+                @Override
+                public void onResult(App.Result<User> result) {
+                    user = app.currentUser();
+                }
+            });
+        }else{
+            user = app.currentUser();
+        }
         mongoClient = user.getMongoClient("mongodb-atlas");
         mongoDatabase = mongoClient.getDatabase("bdoHelp");
         mongoCollection = mongoDatabase.getCollection("Items");
